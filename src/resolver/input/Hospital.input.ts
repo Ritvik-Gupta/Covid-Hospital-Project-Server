@@ -1,5 +1,5 @@
+import { IsNumberString, MaxLength, MinLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
-import { MaxLength } from "class-validator";
 
 @InputType()
 export class HospitalInput {
@@ -16,6 +16,8 @@ export class HospitalInput {
 	city: string;
 
 	@Field(() => String, { nullable: true })
+	@MinLength(10)
 	@MaxLength(10)
+	@IsNumberString()
 	pincode?: string;
 }

@@ -1,21 +1,27 @@
-import "reflect-metadata";
+import { ApolloServer } from "apollo-server-express";
 import dotenv from "dotenv";
 import express from "express";
-import { Container } from "typedi";
+import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { ApolloServer } from "apollo-server-express";
-
-import { HospitalResolver } from "./resolver/Hospital";
-import { createConnection, useContainer } from "typeorm";
+import { createConnection } from "typeorm";
+import { BedResolver } from "./resolver/Bed.resolver";
+import { DoctorResolver } from "./resolver/Doctor.resolver";
+import { HospitalResolver } from "./resolver/Hospital.resolver";
+import { PatientResolver } from "./resolver/Patient.resolver";
+import { RoomResolver } from "./resolver/Room.resolver";
 
 dotenv.config();
 (async () => {
-	useContainer(Container);
 	await createConnection();
 
 	const schema = await buildSchema({
-		resolvers: [HospitalResolver],
-		container: Container,
+		resolvers: [
+			HospitalResolver,
+			BedResolver,
+			RoomResolver,
+			PatientResolver,
+			DoctorResolver,
+		],
 	});
 	const apolloServer = new ApolloServer({ schema });
 
@@ -24,6 +30,6 @@ dotenv.config();
 
 	app.listen(process.env.PORT, () => {
 		console.log("Graphql Server Up and Running on");
-		console.log(`https://localhost:${process.env.PORT}/graphql`);
+		console.log(`http://localhost:${process.env.PORT}/graphql`);
 	});
 })();
