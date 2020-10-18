@@ -15,7 +15,7 @@ export class HospitalResolver {
 		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<Hospital> {
 		const hospital = await createQueryBuilder(Hospital, "hospital")
-			.innerJoinAndSelect("hospital.rooms", "rooms")
+			.leftJoinAndSelect("hospital.rooms", "rooms")
 			.where("hospital.id = :id", { id: hospitalId })
 			.getOne();
 		if (hospital === undefined) throw new Error("No such Hospital");
