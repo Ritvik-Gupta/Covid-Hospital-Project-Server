@@ -1,7 +1,7 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Doctor } from "./Doctor.entity";
-import { Patient } from "./Patient.entity";
+import { Doctor } from "./Doctor.ent";
+import { Patient } from "./Patient.ent";
 
 export enum userRoles {
 	PATIENT = "PATIENT",

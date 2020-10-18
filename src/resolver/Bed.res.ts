@@ -1,8 +1,8 @@
 import { Arg, Int, Mutation, Resolver } from "type-graphql";
 import { getRepository } from "typeorm";
-import { Bed } from "../entity/Bed.entity";
-import { Hospital } from "../entity/Hospital.entity";
-import { Room } from "../entity/Room.entity";
+import { Bed } from "../entity/Bed.ent";
+import { Hospital } from "../entity/Hospital.ent";
+import { Room } from "../entity/Room.ent";
 
 @Resolver()
 export class BedResolver {

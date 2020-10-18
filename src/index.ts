@@ -4,11 +4,11 @@ import express from "express";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
-import { BedResolver } from "./resolver/Bed.resolver";
-import { DoctorResolver } from "./resolver/Doctor.resolver";
-import { HospitalResolver } from "./resolver/Hospital.resolver";
-import { PatientResolver } from "./resolver/Patient.resolver";
-import { RoomResolver } from "./resolver/Room.resolver";
+import { BedResolver } from "./resolver/Bed.res";
+import { DoctorResolver } from "./resolver/Doctor.res";
+import { HospitalResolver } from "./resolver/Hospital.res";
+import { PatientResolver } from "./resolver/Patient.res";
+import { RoomResolver } from "./resolver/Room.res";
 
 dotenv.config();
 (async () => {

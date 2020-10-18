@@ -6,7 +6,7 @@ import {
 	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
-import { Room } from "./Room.entity";
+import { Room } from "./Room.ent";
 
 @ObjectType()
 @Entity()

@@ -1,9 +1,9 @@
 import { hash } from "argon2";
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { getRepository } from "typeorm";
-import { Doctor } from "../entity/Doctor.entity";
-import { User, userRoles } from "../entity/User.entity";
-import { DoctorInput } from "./input/Doctor.input";
+import { Doctor } from "../entity/Doctor.ent";
+import { User, userRoles } from "../entity/User.ent";
+import { DoctorInput } from "./input/Doctor.inp";
 
 @Resolver()
 export class DoctorResolver {

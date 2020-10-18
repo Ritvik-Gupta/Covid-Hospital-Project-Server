@@ -1,7 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { createQueryBuilder, getRepository } from "typeorm";
-import { Hospital } from "../entity/Hospital.entity";
-import { HospitalInput } from "./input/Hospital.input";
+import { Hospital } from "../entity/Hospital.ent";
+import { HospitalInput } from "./input/Hospital.inp";
 
 @Resolver()
 export class HospitalResolver {

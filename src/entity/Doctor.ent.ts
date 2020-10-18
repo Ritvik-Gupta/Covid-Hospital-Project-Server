@@ -1,16 +1,16 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { User } from "./User.entity";
+import { User } from "./User.ent";
 
 @ObjectType()
 @Entity()
-export class Patient {
+export class Doctor {
 	@Field(() => ID)
 	@PrimaryColumn({ type: "uuid" })
 	userId: string;
 
 	@Field(() => User)
-	@OneToOne(() => User, user => user.patient)
+	@OneToOne(() => User, user => user.doctor)
 	@JoinColumn({ name: "userId", referencedColumnName: "userId" })
 	user: User;
 
