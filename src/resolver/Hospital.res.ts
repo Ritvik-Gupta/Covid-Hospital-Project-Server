@@ -1,11 +1,11 @@
-import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Mutation, Query, Resolver } from "type-graphql";
 import { createQueryBuilder, getRepository } from "typeorm";
 import { Hospital } from "../entity/Hospital.ent";
 import { HospitalRegister } from "../entity/HospitalRegister.ent";
-import { keys } from "../service/customTypes";
-import { HospitalInput } from "./input/Hospital.inp";
-import { hospitalDef, userDef } from "./middleware/isDefined.mid";
-import { registerNotDef } from "./middleware/isNotDefined.mid";
+import { hospitalDef, userDef } from "../middleware/isDefined.mid";
+import { hospitalNotDef, registerNotDef } from "../middleware/isNotDefined.mid";
+import { ArgKey, ValidateArgs } from "../service/customTypes";
+import { HospitalInput } from "../input/Hospital.inp";
 
 @Resolver()
 export class HospitalResolver {
@@ -16,7 +16,7 @@ export class HospitalResolver {
 
 	@Query(() => Hospital)
 	async hospital(
-		@Arg(keys.hospitalId, () => String) hospitalId: string
+		@ArgKey("hospitalId", () => String) hospitalId: string
 	): Promise<Hospital> {
 		const hospital = await createQueryBuilder(Hospital, "hospital")
 			.leftJoinAndSelect("hospital.rooms", "rooms")
@@ -28,22 +28,25 @@ export class HospitalResolver {
 	}
 
 	@Mutation(() => Boolean)
+	@ValidateArgs([hospitalNotDef])
 	async addHospital(
-		@Arg(keys.hospital, () => HospitalInput) hospInp: HospitalInput
+		@ArgKey("hospital", () => HospitalInput) hospInp: HospitalInput
 	): Promise<boolean> {
-		await getRepository(Hospital).insert(hospInp);
+		await createQueryBuilder().insert().into(Hospital).values(hospInp).execute();
 		return true;
 	}
 
 	@Mutation(() => Boolean)
-	@UseMiddleware(hospitalDef, userDef, registerNotDef)
+	@ValidateArgs([hospitalDef, userDef, registerNotDef])
 	async registerToHospital(
-		@Arg(keys.hospitalId, () => String) hospitalId: string,
-		@Arg(keys.userId, () => String) userId: string
+		@ArgKey("hospitalId", () => String) hospitalId: string,
+		@ArgKey("userId", () => String) userId: string
 	): Promise<boolean> {
-		await getRepository(HospitalRegister).save(
-			getRepository(HospitalRegister).create({ hospitalId, userId })
-		);
+		await createQueryBuilder()
+			.insert()
+			.into(HospitalRegister)
+			.values({ hospitalId, userId })
+			.execute();
 		return true;
 	}
 }

@@ -1,20 +1,20 @@
 import { hash } from "argon2";
-import { Arg, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { getRepository } from "typeorm";
+import { Mutation, Resolver } from "type-graphql";
+import { createQueryBuilder, getRepository } from "typeorm";
 import { Patient } from "../entity/Patient.ent";
 import { User, userRoles } from "../entity/User.ent";
-import { keys } from "../service/customTypes";
-import { PatientInput } from "./input/Patient.inp";
-import { UserInput } from "./input/User.inp";
-import { userNotDef } from "./middleware/isNotDefined.mid";
+import { userNotDef } from "../middleware/isNotDefined.mid";
+import { ArgKey, ValidateArgs } from "../service/customTypes";
+import { PatientInput } from "../input/Patient.inp";
+import { UserInput } from "../input/User.inp";
 
 @Resolver()
 export class PatientResolver {
 	@Mutation(() => Boolean)
-	@UseMiddleware(userNotDef)
+	@ValidateArgs([userNotDef])
 	async registerPatient(
-		@Arg(keys.user, () => UserInput) { password, ...userInp }: UserInput,
-		@Arg(keys.patient, () => PatientInput) patientInp: PatientInput
+		@ArgKey("user", () => UserInput) { password, ...userInp }: UserInput,
+		@ArgKey("patient", () => PatientInput) patientInp: PatientInput
 	): Promise<boolean> {
 		const hashPassword = await hash(password);
 		const user = getRepository(User).create({
@@ -24,9 +24,11 @@ export class PatientResolver {
 		});
 		await getRepository(User).save(user);
 
-		await getRepository(Patient).save(
-			getRepository(Patient).create({ ...patientInp, user })
-		);
+		await createQueryBuilder()
+			.insert()
+			.into(Patient)
+			.values({ ...patientInp, user })
+			.execute();
 		return true;
 	}
 }

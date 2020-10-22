@@ -17,7 +17,7 @@ export class Hospital {
 	id: string;
 
 	@Field(() => String)
-	@Column({ type: "varchar", length: 30 })
+	@Column({ type: "varchar", length: 30, unique: true })
 	name: string;
 
 	@Field(() => String)

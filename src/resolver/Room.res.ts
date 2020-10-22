@@ -1,21 +1,23 @@
-import { Arg, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { getRepository } from "typeorm";
+import { Int, Mutation, Resolver } from "type-graphql";
+import { createQueryBuilder } from "typeorm";
 import { Room } from "../entity/Room.ent";
-import { keys } from "../service/customTypes";
-import { hospitalDef } from "./middleware/isDefined.mid";
-import { roomNotDef } from "./middleware/isNotDefined.mid";
+import { hospitalDef } from "../middleware/isDefined.mid";
+import { roomNotDef } from "../middleware/isNotDefined.mid";
+import { ArgKey, ValidateArgs } from "../service/customTypes";
 
 @Resolver()
 export class RoomResolver {
 	@Mutation(() => Boolean)
-	@UseMiddleware(hospitalDef, roomNotDef)
+	@ValidateArgs([hospitalDef, roomNotDef])
 	async addRoom(
-		@Arg(keys.hospitalId, () => String) hospitalId: string,
-		@Arg(keys.roomNo, () => Int) roomNo: number
+		@ArgKey("hospitalId", () => String) hospitalId: string,
+		@ArgKey("roomNo", () => Int) roomNo: number
 	): Promise<boolean> {
-		await getRepository(Room).save(
-			getRepository(Room).create({ hospitalId, roomNo })
-		);
+		await createQueryBuilder()
+			.insert()
+			.into(Room)
+			.values({ hospitalId, roomNo })
+			.execute();
 		return true;
 	}
 }

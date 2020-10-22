@@ -1,22 +1,22 @@
 import { hash } from "argon2";
-import { Arg, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { getRepository } from "typeorm";
+import { Mutation, Resolver } from "type-graphql";
+import { createQueryBuilder, getRepository } from "typeorm";
 import { Appointment } from "../entity/Appointment.ent";
 import { Doctor } from "../entity/Doctor.ent";
 import { User, userRoles } from "../entity/User.ent";
-import { keys } from "../service/customTypes";
-import { DoctorInput } from "./input/Doctor.inp";
-import { UserInput } from "./input/User.inp";
-import { doctorDef, patientDef } from "./middleware/isDefined.mid";
-import { appointmentNotDef, userNotDef } from "./middleware/isNotDefined.mid";
+import { doctorDef, patientDef } from "../middleware/isDefined.mid";
+import { appointmentNotDef, userNotDef } from "../middleware/isNotDefined.mid";
+import { ArgKey, ValidateArgs } from "../service/customTypes";
+import { DoctorInput } from "../input/Doctor.inp";
+import { UserInput } from "../input/User.inp";
 
 @Resolver()
 export class PatientResolver {
 	@Mutation(() => Boolean)
-	@UseMiddleware(userNotDef)
+	@ValidateArgs([userNotDef])
 	async registerDoctor(
-		@Arg(keys.user, () => UserInput) { password, ...userInp }: UserInput,
-		@Arg(keys.doctor, () => DoctorInput) doctorInp: DoctorInput
+		@ArgKey("user", () => UserInput) { password, ...userInp }: UserInput,
+		@ArgKey("doctor", () => DoctorInput) doctorInp: DoctorInput
 	): Promise<boolean> {
 		const hashPassword = await hash(password);
 		const user = getRepository(User).create({
@@ -26,21 +26,25 @@ export class PatientResolver {
 		});
 		await getRepository(User).save(user);
 
-		await getRepository(Doctor).save(
-			getRepository(Doctor).create({ ...doctorInp, user })
-		);
+		await createQueryBuilder()
+			.insert()
+			.into(Doctor)
+			.values({ ...doctorInp, user })
+			.execute();
 		return true;
 	}
 
 	@Mutation(() => Boolean)
-	@UseMiddleware(doctorDef, patientDef, appointmentNotDef)
+	@ValidateArgs([doctorDef, patientDef, appointmentNotDef])
 	async createAppointment(
-		@Arg(keys.doctorId, () => String) doctorId: string,
-		@Arg(keys.patientId, () => String) patientId: string
+		@ArgKey("doctorId", () => String) doctorId: string,
+		@ArgKey("patientId", () => String) patientId: string
 	): Promise<boolean> {
-		await getRepository(Appointment).save(
-			getRepository(Appointment).create({ doctorId, patientId })
-		);
+		await createQueryBuilder()
+			.insert()
+			.into(Appointment)
+			.values({ doctorId, patientId })
+			.execute();
 		return true;
 	}
 }
