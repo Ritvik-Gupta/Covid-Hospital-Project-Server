@@ -6,6 +6,7 @@ import {
 	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
+import { HospitalRegister } from "./HospitalRegister.ent";
 import { Room } from "./Room.ent";
 
 @ObjectType()
@@ -31,11 +32,15 @@ export class Hospital {
 	@Column({ type: "varchar", length: 10, nullable: true })
 	pincode?: string;
 
-	@Field(() => [Room])
-	@OneToMany(() => Room, room => room.belongsTo, { cascade: true })
-	rooms: Room[];
-
 	@Field(() => Date)
 	@CreateDateColumn()
 	createDate: Date;
+
+	@Field(() => [Room])
+	@OneToMany(() => Room, ({ belongsTo }) => belongsTo, { cascade: true })
+	rooms: Room[];
+
+	@Field(() => [HospitalRegister])
+	@OneToMany(() => HospitalRegister, ({ hospital }) => hospital, { cascade: true })
+	register: HospitalRegister[];
 }

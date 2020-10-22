@@ -1,18 +1,10 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import {
-	Column,
-	Entity,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { Appointment } from "./Appointment.ent";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { User } from "./User.ent";
 
 @ObjectType()
 @Entity()
-export class Patient {
+export class Staff {
 	@Field(() => ID)
 	@PrimaryColumn({ type: "uuid" })
 	userId: string;
@@ -30,10 +22,7 @@ export class Patient {
 	pincode?: string;
 
 	@Field(() => User)
-	@OneToOne(() => User, ({ asPatient }) => asPatient)
+	@OneToOne(() => User, ({ asStaff }) => asStaff)
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
 	user: User;
-
-	@OneToMany(() => Appointment, ({ patient }) => patient, { cascade: true })
-	appointments: Appointment[];
 }

@@ -1,24 +1,8 @@
-import { IsEmail, IsNumberString, MaxLength, MinLength } from "class-validator";
+import { IsNumberString, MaxLength, MinLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
 
 @InputType()
 export class PatientInput {
-	@Field(() => String)
-	@MaxLength(30)
-	firstName: string;
-
-	@Field(() => String, { nullable: true })
-	@MaxLength(30)
-	middleName: string;
-
-	@Field(() => String)
-	@MaxLength(30)
-	lastName: string;
-
-	@Field(() => String)
-	@IsEmail()
-	email: string;
-
 	@Field(() => String)
 	@MaxLength(30)
 	state: string;
@@ -32,9 +16,4 @@ export class PatientInput {
 	@MaxLength(10)
 	@IsNumberString()
 	pincode?: string;
-
-	@Field(() => String)
-	@MinLength(5)
-	@MaxLength(20)
-	password: string;
 }

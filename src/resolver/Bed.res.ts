@@ -1,34 +1,21 @@
-import { Arg, Int, Mutation, Resolver } from "type-graphql";
+import { Arg, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { getRepository } from "typeorm";
 import { Bed } from "../entity/Bed.ent";
-import { Hospital } from "../entity/Hospital.ent";
-import { Room } from "../entity/Room.ent";
+import { keys } from "../service/customTypes";
+import { hospitalDef, roomDef } from "./middleware/isDefined.mid";
+import { bedNotDef } from "./middleware/isNotDefined.mid";
 
 @Resolver()
 export class BedResolver {
 	@Mutation(() => Boolean)
+	@UseMiddleware(hospitalDef, roomDef, bedNotDef)
 	async addBed(
-		@Arg("hospitalId", () => String) hospitalId: string,
-		@Arg("roomNo", () => Int) roomNo: number,
-		@Arg("bedNo", () => Int) bedNo: number
+		@Arg(keys.hospitalId, () => String) hospitalId: string,
+		@Arg(keys.roomNo, () => Int) roomNo: number,
+		@Arg(keys.bedNo, () => Int) bedNo: number
 	): Promise<boolean> {
-		const hospital = await getRepository(Hospital).findOne({
-			where: { id: hospitalId },
-		});
-		if (hospital === undefined) throw new Error("Invalid Hospital Provided");
-
-		const room = await getRepository(Room).findOne({
-			where: { belongsTo: hospital, roomNo },
-		});
-		if (room === undefined) throw new Error("Invalid Room Provided");
-
-		const [, checkBed] = await getRepository(Bed).findAndCount({
-			where: { bedNo, roomNo: room.roomNo, hospitalId: room.hospitalId },
-		});
-		if (checkBed > 0) throw new Error("Bed already created");
-
 		await getRepository(Bed).save(
-			getRepository(Bed).create({ bedNo, inRoom: room })
+			getRepository(Bed).create({ bedNo, roomNo, hospitalId })
 		);
 		return true;
 	}

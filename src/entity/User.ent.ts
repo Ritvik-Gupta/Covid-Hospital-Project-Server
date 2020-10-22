@@ -1,7 +1,9 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Doctor } from "./Doctor.ent";
+import { HospitalRegister } from "./HospitalRegister.ent";
 import { Patient } from "./Patient.ent";
+import { Staff } from "./Staff.ent";
 
 export enum userRoles {
 	PATIENT = "PATIENT",
@@ -14,7 +16,7 @@ export enum userRoles {
 export class User {
 	@Field(() => ID)
 	@PrimaryGeneratedColumn("uuid")
-	userId: string;
+	id: string;
 
 	@Field(() => String)
 	@Column({ type: "varchar", length: 30 })
@@ -39,9 +41,15 @@ export class User {
 	@Column({ type: "varchar" })
 	hashPassword: string;
 
-	@OneToOne(() => Patient, patient => patient.user)
-	patient: Patient;
+	@OneToOne(() => Patient, ({ user }) => user)
+	asPatient: Patient;
 
-	@OneToOne(() => Doctor, doctor => doctor.user)
-	doctor: Doctor;
+	@OneToOne(() => Doctor, ({ user }) => user)
+	asDoctor: Doctor;
+
+	@OneToOne(() => Staff, ({ user }) => user)
+	asStaff: Staff;
+
+	@OneToOne(() => HospitalRegister, ({ user }) => user)
+	registeredAt: HospitalRegister;
 }

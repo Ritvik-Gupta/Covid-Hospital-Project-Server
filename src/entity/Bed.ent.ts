@@ -23,14 +23,14 @@ export class Bed {
 	@PrimaryColumn({ type: "uuid" })
 	hospitalId: string;
 
-	@ManyToOne(() => Room, room => room.beds)
+	@Field(() => Date)
+	@CreateDateColumn()
+	createDate: Date;
+
+	@ManyToOne(() => Room, ({ beds }) => beds)
 	@JoinColumn([
 		{ name: "roomNo", referencedColumnName: "roomNo" },
 		{ name: "hospitalId", referencedColumnName: "hospitalId" },
 	])
 	inRoom: Room;
-
-	@Field(() => Date)
-	@CreateDateColumn()
-	createDate: Date;
 }

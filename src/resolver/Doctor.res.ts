@@ -1,39 +1,46 @@
 import { hash } from "argon2";
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { getRepository } from "typeorm";
+import { Appointment } from "../entity/Appointment.ent";
 import { Doctor } from "../entity/Doctor.ent";
 import { User, userRoles } from "../entity/User.ent";
+import { keys } from "../service/customTypes";
 import { DoctorInput } from "./input/Doctor.inp";
+import { UserInput } from "./input/User.inp";
+import { doctorDef, patientDef } from "./middleware/isDefined.mid";
+import { appointmentNotDef, userNotDef } from "./middleware/isNotDefined.mid";
 
 @Resolver()
-export class DoctorResolver {
+export class PatientResolver {
 	@Mutation(() => Boolean)
+	@UseMiddleware(userNotDef)
 	async registerDoctor(
-		@Arg("doctor", () => DoctorInput) doctorInput: DoctorInput
+		@Arg(keys.user, () => UserInput) { password, ...userInp }: UserInput,
+		@Arg(keys.doctor, () => DoctorInput) doctorInp: DoctorInput
 	): Promise<boolean> {
-		const [, userCount] = await getRepository(User).findAndCount({
-			where: { email: doctorInput.email },
-		});
-		if (userCount > 0) throw new Error("User Already Registered with the Email");
-
-		const hashPassword = await hash(doctorInput.password);
+		const hashPassword = await hash(password);
 		const user = getRepository(User).create({
-			firstName: doctorInput.firstName,
-			middleName: doctorInput.middleName,
-			lastName: doctorInput.lastName,
-			email: doctorInput.email,
-			role: userRoles.DOCTOR,
+			...userInp,
 			hashPassword,
+			role: userRoles.DOCTOR,
 		});
 		await getRepository(User).save(user);
 
-		const doctor = getRepository(Doctor).create({
-			state: doctorInput.state,
-			city: doctorInput.city,
-			pincode: doctorInput.pincode,
-			user,
-		});
-		await getRepository(Doctor).save(doctor);
+		await getRepository(Doctor).save(
+			getRepository(Doctor).create({ ...doctorInp, user })
+		);
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	@UseMiddleware(doctorDef, patientDef, appointmentNotDef)
+	async createAppointment(
+		@Arg(keys.doctorId, () => String) doctorId: string,
+		@Arg(keys.patientId, () => String) patientId: string
+	): Promise<boolean> {
+		await getRepository(Appointment).save(
+			getRepository(Appointment).create({ doctorId, patientId })
+		);
 		return true;
 	}
 }

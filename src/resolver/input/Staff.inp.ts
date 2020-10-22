@@ -2,7 +2,7 @@ import { IsNumberString, MaxLength, MinLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class DoctorInput {
+export class StaffInput {
 	@Field(() => String)
 	@MaxLength(30)
 	state: string;
