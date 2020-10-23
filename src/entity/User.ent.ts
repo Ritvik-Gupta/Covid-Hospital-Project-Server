@@ -4,12 +4,7 @@ import { Doctor } from "./Doctor.ent";
 import { HospitalRegister } from "./HospitalRegister.ent";
 import { Patient } from "./Patient.ent";
 import { Staff } from "./Staff.ent";
-
-export enum userRoles {
-	PATIENT = "PATIENT",
-	DOCTOR = "DOCTOR",
-	STAFF = "STAFF",
-}
+import { userRoles } from "../service/customTypes";
 
 @ObjectType()
 @Entity()

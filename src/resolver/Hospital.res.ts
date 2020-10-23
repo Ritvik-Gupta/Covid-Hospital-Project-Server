@@ -24,14 +24,13 @@ export class HospitalResolver {
 	@Query(() => Hospital)
 	async hospital(
 		@Arg("hospitalId", () => String) hospitalId: string
-	): Promise<Hospital> {
+	): Promise<Hospital | undefined> {
 		const hospital = await this.hospitalRepo
 			.createQueryBuilder("hospital")
 			.leftJoinAndSelect("hospital.rooms", "rooms")
 			.where("hospital.id = :hospitalId", { hospitalId })
 			.getOne();
 		if (hospital === undefined) throw new Error("No such Hospital exists");
-
 		return hospital;
 	}
 

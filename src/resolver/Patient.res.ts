@@ -1,7 +1,7 @@
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { userRoles } from "../entity/User.ent";
+import { userRoles } from "../service/customTypes";
 import { PatientInput } from "../input/Patient.inp";
 import { UserInput } from "../input/User.inp";
 import { PatientRepository } from "../repository/Patient.rep";

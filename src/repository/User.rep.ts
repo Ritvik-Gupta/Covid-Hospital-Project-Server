@@ -1,8 +1,9 @@
 import { hash } from "argon2";
 import { Service } from "typedi";
 import { EntityRepository, Repository } from "typeorm";
-import { User, userRoles } from "../entity/User.ent";
+import { User } from "../entity/User.ent";
 import { UserInput } from "../input/User.inp";
+import { customCtx, userRoles } from "../service/customTypes";
 
 @Service()
 @EntityRepository(User)
@@ -23,5 +24,9 @@ export class UserRepository extends Repository<User> {
 	): Promise<User> {
 		const hashPassword = await hash(password);
 		return await this.save(this.create({ ...userInp, hashPassword, role }));
+	}
+
+	async login({ req }: customCtx, { id, email, role }: User) {
+		req.session.user = { id, email, role };
 	}
 }

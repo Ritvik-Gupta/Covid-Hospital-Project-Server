@@ -1,11 +1,11 @@
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { userRoles } from "../entity/User.ent";
-import { PatientInput } from "../input/Patient.inp";
+import { StaffInput } from "../input/Staff.inp";
 import { UserInput } from "../input/User.inp";
 import { StaffRepository } from "../repository/Staff.rep";
 import { UserRepository } from "../repository/User.rep";
+import { userRoles } from "../service/customTypes";
 
 @Service()
 @Resolver()
@@ -16,13 +16,13 @@ export class StaffResolver {
 	) {}
 
 	@Mutation(() => Boolean)
-	async registerPatient(
+	async registerStaff(
 		@Arg("user", () => UserInput) userInp: UserInput,
-		@Arg("patient", () => PatientInput) patientInp: PatientInput
+		@Arg("staff", () => StaffInput) staffInp: StaffInput
 	): Promise<boolean> {
 		await this.userRepo.isNotDef(userInp.email);
-		const user = await this.userRepo.createAndReturn(userInp, userRoles.PATIENT);
-		await this.staffRepo.insert({ ...patientInp, user });
+		const user = await this.userRepo.createAndReturn(userInp, userRoles.STAFF);
+		await this.staffRepo.insert({ ...staffInp, user });
 		return true;
 	}
 }
