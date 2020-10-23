@@ -11,7 +11,7 @@ import { UserRepository } from "../repository/User.rep";
 
 @Service()
 @Resolver()
-export class PatientResolver {
+export class DoctorResolver {
 	constructor(
 		@InjectRepository() private readonly userRepo: UserRepository,
 		@InjectRepository() private readonly doctorRepo: DoctorRepository,
