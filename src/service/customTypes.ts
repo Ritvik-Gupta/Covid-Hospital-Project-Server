@@ -27,16 +27,18 @@ export type argDict = {
 	hospital: HospitalInput;
 };
 
-export type ArgValidator = (args: argDict, context: customCtx) => Promise<void>;
+export type argKeys = keyof argDict;
+
+export type ArgValidator = (args: argDict) => Promise<void>;
 
 export const ValidateArgs = (middlewares: ArgValidator[]) =>
-	createMethodDecorator(async ({ args, context }: ResolverData<customCtx>, next) => {
-		for (let middleware of middlewares) await middleware(args as argDict, context);
+	createMethodDecorator(async ({ args }: ResolverData<customCtx>, next) => {
+		for (let middleware of middlewares) await middleware(args as argDict);
 		return next();
 	});
 
 export const ArgKey = (
-	name: keyof argDict,
+	name: argKeys,
 	returnTypeFunc: ReturnTypeFunc,
 	options?: ArgOptions
 ) => Arg(name, returnTypeFunc, options);

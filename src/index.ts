@@ -40,7 +40,7 @@ import { createConnection } from "typeorm";
 	apolloServer.applyMiddleware({ app });
 
 	app.listen(process.env.PORT, () => {
-		console.log("Graphql Server Up and Running on");
-		console.log(`http://localhost:${process.env.PORT}/graphql`);
+		console.log("\n\nGraphql Server Up and Running on");
+		console.log(`http://localhost:${process.env.PORT}/graphql\n\n`);
 	});
 })();
