@@ -1,34 +1,28 @@
-import { hash } from "argon2";
-import { Mutation, Resolver } from "type-graphql";
-import { createQueryBuilder, getRepository } from "typeorm";
-import { Patient } from "../entity/Patient.ent";
-import { User, userRoles } from "../entity/User.ent";
-import { userNotDef } from "../middleware/isNotDefined.mid";
-import { ArgKey, ValidateArgs } from "../service/customTypes";
+import { Arg, Mutation, Resolver } from "type-graphql";
+import { Service } from "typedi";
+import { InjectRepository } from "typeorm-typedi-extensions";
+import { userRoles } from "../entity/User.ent";
 import { PatientInput } from "../input/Patient.inp";
 import { UserInput } from "../input/User.inp";
+import { PatientRepository } from "../repository/Patient.rep";
+import { UserRepository } from "../repository/User.rep";
 
+@Service()
 @Resolver()
 export class PatientResolver {
-	@Mutation(() => Boolean)
-	@ValidateArgs([userNotDef])
-	async registerPatient(
-		@ArgKey("user", () => UserInput) { password, ...userInp }: UserInput,
-		@ArgKey("patient", () => PatientInput) patientInp: PatientInput
-	): Promise<boolean> {
-		const hashPassword = await hash(password);
-		const user = getRepository(User).create({
-			...userInp,
-			hashPassword,
-			role: userRoles.PATIENT,
-		});
-		await getRepository(User).save(user);
+	constructor(
+		@InjectRepository() private readonly userRepo: UserRepository,
+		@InjectRepository() private readonly patientRepo: PatientRepository
+	) {}
 
-		await createQueryBuilder()
-			.insert()
-			.into(Patient)
-			.values({ ...patientInp, user })
-			.execute();
+	@Mutation(() => Boolean)
+	async registerPatient(
+		@Arg("user", () => UserInput) userInp: UserInput,
+		@Arg("patient", () => PatientInput) patientInp: PatientInput
+	): Promise<boolean> {
+		await this.userRepo.isNotDef(userInp.email);
+		const user = await this.userRepo.createAndReturn(userInp, userRoles.PATIENT);
+		await this.patientRepo.insert({ ...patientInp, user });
 		return true;
 	}
 }

@@ -1,52 +1,58 @@
-import { Mutation, Query, Resolver } from "type-graphql";
-import { createQueryBuilder, getRepository } from "typeorm";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Service } from "typedi";
+import { InjectRepository } from "typeorm-typedi-extensions";
 import { Hospital } from "../entity/Hospital.ent";
-import { HospitalRegister } from "../entity/HospitalRegister.ent";
-import { hospitalDef, userDef } from "../middleware/isDefined.mid";
-import { hospitalNotDef, registerNotDef } from "../middleware/isNotDefined.mid";
-import { ArgKey, ValidateArgs } from "../service/customTypes";
 import { HospitalInput } from "../input/Hospital.inp";
+import { HospitalRepository } from "../repository/Hospital.rep";
+import { HospitalRegisterRepository } from "../repository/HospitalRegister.rep";
+import { UserRepository } from "../repository/User.rep";
 
+@Service()
 @Resolver()
 export class HospitalResolver {
+	constructor(
+		@InjectRepository() private readonly hospitalRepo: HospitalRepository,
+		@InjectRepository() private readonly userRepo: UserRepository,
+		@InjectRepository() private readonly hospRegisterRepo: HospitalRegisterRepository
+	) {}
+
 	@Query(() => [Hospital])
 	async hospitals(): Promise<Hospital[]> {
-		return await getRepository(Hospital).find();
+		return await this.hospitalRepo.find();
 	}
 
 	@Query(() => Hospital)
 	async hospital(
-		@ArgKey("hospitalId", () => String) hospitalId: string
+		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<Hospital> {
-		const hospital = await createQueryBuilder(Hospital, "hospital")
+		const hospital = await this.hospitalRepo
+			.createQueryBuilder("hospital")
 			.leftJoinAndSelect("hospital.rooms", "rooms")
 			.where("hospital.id = :hospitalId", { hospitalId })
 			.getOne();
-		if (hospital === undefined) throw new Error("No such Hospital");
+		if (hospital === undefined) throw new Error("No such Hospital exists");
 
 		return hospital;
 	}
 
 	@Mutation(() => Boolean)
-	@ValidateArgs([hospitalNotDef])
 	async addHospital(
-		@ArgKey("hospital", () => HospitalInput) hospInp: HospitalInput
+		@Arg("hospital", () => HospitalInput) hospInp: HospitalInput
 	): Promise<boolean> {
-		await createQueryBuilder().insert().into(Hospital).values(hospInp).execute();
+		await this.hospitalRepo.isNotDef(hospInp.name);
+		await this.hospitalRepo.insert(hospInp);
 		return true;
 	}
 
 	@Mutation(() => Boolean)
-	@ValidateArgs([hospitalDef, userDef, registerNotDef])
 	async registerToHospital(
-		@ArgKey("hospitalId", () => String) hospitalId: string,
-		@ArgKey("userId", () => String) userId: string
+		@Arg("hospitalId", () => String) hospitalId: string,
+		@Arg("userId", () => String) userId: string
 	): Promise<boolean> {
-		await createQueryBuilder()
-			.insert()
-			.into(HospitalRegister)
-			.values({ hospitalId, userId })
-			.execute();
+		await this.hospitalRepo.isNotDef(hospitalId);
+		await this.userRepo.isDef(userId);
+		await this.hospRegisterRepo.isNotDef(userId);
+		await this.hospRegisterRepo.insert({ hospitalId, userId });
 		return true;
 	}
 }

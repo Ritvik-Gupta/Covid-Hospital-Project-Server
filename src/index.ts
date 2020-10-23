@@ -4,10 +4,12 @@ import express from "express";
 import session from "express-session";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { createConnection } from "typeorm";
+import { createConnection, useContainer } from "typeorm";
+import { Container } from "typedi";
 
 (async () => {
 	dotenv.config();
+	useContainer(Container);
 	await createConnection();
 
 	const app = express();
@@ -28,6 +30,7 @@ import { createConnection } from "typeorm";
 
 	const schema = await buildSchema({
 		resolvers: [__dirname + "/resolver/**/*.res.ts"],
+		container: Container,
 	});
 	const apolloServer = new ApolloServer({
 		schema,
@@ -40,7 +43,7 @@ import { createConnection } from "typeorm";
 	apolloServer.applyMiddleware({ app });
 
 	app.listen(process.env.PORT, () => {
-		console.log("Graphql Server Up and Running on");
-		console.log(`http://localhost:${process.env.PORT}/graphql`);
+		console.log("\n\nGraphql Server Up and Running on");
+		console.log(`http://localhost:${process.env.PORT}/graphql\n\n`);
 	});
 })();
