@@ -1,3 +1,4 @@
+import { ValidationError } from "class-validator";
 import { Request, Response } from "express";
 
 export enum userRoles {
@@ -6,13 +7,25 @@ export enum userRoles {
 	STAFF = "STAFF",
 }
 
-export interface UserLogin {
-	id: string;
-	email: string;
-	role: userRoles;
-}
+export type customRequest = Request & {
+	session: Express.Session & { userId?: string };
+};
 
 export interface customCtx {
-	req: Request & { session: Express.Session & { user?: UserLogin } };
+	req: customRequest;
 	res: Response;
 }
+
+export type customGQLExtension = {
+	exception: { validationErrors?: ValidationError[] };
+};
+
+export type customValidErr = Partial<ValidationError> & {
+	property: string;
+	constraints: any;
+};
+
+export type customGQLError = {
+	message: string;
+	validationErrors?: customValidErr[];
+};

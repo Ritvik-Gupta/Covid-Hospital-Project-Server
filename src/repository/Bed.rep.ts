@@ -5,7 +5,7 @@ import { Bed } from "../entity/Bed.ent";
 @Service()
 @EntityRepository(Bed)
 export class BedRepository extends Repository<Bed> {
-	async isNotDef(bedNo: number, roomNo: number, hospitalId: string) {
+	async isNotDef(bedNo: number, roomNo: number, hospitalId: string): Promise<void> {
 		const [, check] = await this.findAndCount({
 			where: { bedNo, roomNo, hospitalId },
 		});

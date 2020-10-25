@@ -5,8 +5,9 @@ import { Staff } from "../entity/Staff.ent";
 @Service()
 @EntityRepository(Staff)
 export class StaffRepository extends Repository<Staff> {
-	async isDef(userId: string): Promise<void> {
-		const [, check] = await this.findAndCount({ where: { userId } });
-		if (check === 0) throw new Error("No such Staff exists");
+	async isDef(userId: string): Promise<Staff> {
+		const staff = await this.findOne({ where: { userId } });
+		if (staff === undefined) throw new Error("No such Staff exists");
+		return staff;
 	}
 }

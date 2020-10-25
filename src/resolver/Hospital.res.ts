@@ -1,4 +1,4 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Hospital } from "../entity/Hospital.ent";
@@ -35,6 +35,7 @@ export class HospitalResolver {
 	}
 
 	@Mutation(() => Boolean)
+	@Authorized()
 	async addHospital(
 		@Arg("hospital", () => HospitalInput) hospInp: HospitalInput
 	): Promise<boolean> {
@@ -48,7 +49,7 @@ export class HospitalResolver {
 		@Arg("hospitalId", () => String) hospitalId: string,
 		@Arg("userId", () => String) userId: string
 	): Promise<boolean> {
-		await this.hospitalRepo.isNotDef(hospitalId);
+		await this.hospitalRepo.isDef(hospitalId);
 		await this.userRepo.isDef(userId);
 		await this.hospRegisterRepo.isNotDef(userId);
 		await this.hospRegisterRepo.insert({ hospitalId, userId });

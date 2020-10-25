@@ -1,18 +1,47 @@
 import { ApolloServer } from "apollo-server-express";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { createConnection, useContainer } from "typeorm";
 import { Container } from "typedi";
+import { createConnection, useContainer } from "typeorm";
+import { customAuthChecker, customFormatError } from "./service/customFns";
 
 (async () => {
 	dotenv.config();
 	useContainer(Container);
 	await createConnection();
 
+	const schema = await buildSchema({
+		resolvers: [__dirname + "/resolver/**/*.res.ts"],
+		authChecker: customAuthChecker,
+		container: Container,
+		authMode: "error",
+		validate: {
+			validationError: {
+				target: false,
+				value: false,
+			},
+		},
+	});
+	const apolloServer = new ApolloServer({
+		schema,
+		context: ({ req, res }) => ({ req, res }),
+		formatError: customFormatError,
+		playground: {
+			settings: { "request.credentials": "include" },
+		},
+	});
+
 	const app = express();
+	app.use(
+		cors({
+			origin: process.env.CORS_ORIGIN,
+			credentials: true,
+		})
+	);
 	app.use(
 		session({
 			name: process.env.COOKIE_NAME,
@@ -28,19 +57,7 @@ import { Container } from "typedi";
 		})
 	);
 
-	const schema = await buildSchema({
-		resolvers: [__dirname + "/resolver/**/*.res.ts"],
-		container: Container,
-	});
-	const apolloServer = new ApolloServer({
-		schema,
-		context: ({ req, res }) => ({ req, res }),
-		playground: {
-			settings: { "request.credentials": "include" },
-		},
-	});
-
-	apolloServer.applyMiddleware({ app });
+	apolloServer.applyMiddleware({ app, cors: false });
 
 	app.listen(process.env.PORT, () => {
 		console.log("\n\nGraphql Server Up and Running on");
