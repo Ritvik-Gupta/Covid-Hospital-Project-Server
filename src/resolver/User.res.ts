@@ -35,14 +35,23 @@ export class UserResolver {
 	}
 
 	@Mutation(() => Boolean)
-	async loginUser(
+	async login(
 		@Ctx() { req }: customCtx,
-		@Arg("login", () => LoginInput) { email, password }: LoginInput
+		@Arg("params", () => LoginInput) { email, password }: LoginInput
 	): Promise<boolean> {
 		const user = await this.userRepo.isDef(email, { withEmail: true });
 		const isValidPassowrd = await verify(user.password, password);
 		if (isValidPassowrd === false) throw new Error("Invalid Passowrd");
 		req.session.userId = user.id;
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	logout(@Ctx() { req, res }: customCtx): boolean {
+		if (req.session.userId === undefined) throw new Error("No one is Logged In");
+		req.session.destroy(() => {
+			res.clearCookie(process.env.COOKIE_NAME as string);
+		});
 		return true;
 	}
 

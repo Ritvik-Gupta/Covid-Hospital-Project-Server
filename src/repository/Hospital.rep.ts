@@ -5,8 +5,13 @@ import { Hospital } from "../entity/Hospital.ent";
 @Service()
 @EntityRepository(Hospital)
 export class HospitalRepository extends Repository<Hospital> {
-	async isDef(hospitalId: string): Promise<Hospital> {
-		const hospital = await this.findOne({ where: { id: hospitalId } });
+	async isDef(
+		checkParam: string,
+		{ withName }: { withName: boolean } = { withName: false }
+	): Promise<Hospital> {
+		const hospital = await this.findOne({
+			where: withName === true ? { name: checkParam } : { id: checkParam },
+		});
 		if (hospital === undefined) throw new Error("No such Hospital exists");
 		return hospital;
 	}
