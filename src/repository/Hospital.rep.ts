@@ -11,8 +11,19 @@ export class HospitalRepository extends Repository<Hospital> {
 		return hospital;
 	}
 
-	async isNotDef(name: string): Promise<void> {
-		const [, check] = await this.findAndCount({ where: { name } });
-		if (check !== 0) throw new Error("Hospital Name must be unique");
+	async isNotDef(
+		checkParam: string,
+		{ withName }: { withName: boolean } = { withName: false }
+	): Promise<void> {
+		const [, check] = await this.findAndCount({
+			where: withName === true ? { name: checkParam } : { id: checkParam },
+		});
+		if (check !== 0) throw new Error("Hospital has already been created");
+	}
+
+	async checkAdmin(hospitalId: string, adminId: string): Promise<void> {
+		const hospital = await this.isDef(hospitalId);
+		if (hospital.adminId !== adminId)
+			throw new Error("Hospital does not belong to the Admin");
 	}
 }

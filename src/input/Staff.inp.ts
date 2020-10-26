@@ -1,8 +1,9 @@
-import { IsNumberString, MaxLength, MinLength } from "class-validator";
+import { IsNumberString, Length, MaxLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
+import { Staff } from "../entity/Staff.ent";
 
 @InputType()
-export class StaffInput {
+export class StaffInput implements Partial<Staff> {
 	@Field(() => String)
 	@MaxLength(30)
 	state: string;
@@ -12,8 +13,7 @@ export class StaffInput {
 	city: string;
 
 	@Field(() => String, { nullable: true })
-	@MinLength(10)
-	@MaxLength(10)
+	@Length(10, 10)
 	@IsNumberString()
 	pincode?: string;
 }

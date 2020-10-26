@@ -12,7 +12,7 @@ import { User } from "./User.ent";
 
 @ObjectType()
 @Entity()
-export class HospitalRegister {
+export class HospRegister {
 	@Field(() => ID)
 	@PrimaryColumn({ type: "uuid" })
 	hospitalId: string;

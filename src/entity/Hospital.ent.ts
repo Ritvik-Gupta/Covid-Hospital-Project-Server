@@ -3,10 +3,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
+	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
-import { HospitalRegister } from "./HospitalRegister.ent";
+import { Admin } from "./Admin.ent";
+import { HospRegister } from "./HospRegister.ent";
 import { Room } from "./Room.ent";
 
 @ObjectType()
@@ -15,6 +18,10 @@ export class Hospital {
 	@Field(() => ID)
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
+
+	@Field(() => String)
+	@Column({ type: "uuid" })
+	adminId: string;
 
 	@Field(() => String)
 	@Column({ type: "varchar", length: 30, unique: true })
@@ -40,7 +47,12 @@ export class Hospital {
 	@OneToMany(() => Room, ({ belongsTo }) => belongsTo, { cascade: true })
 	rooms: Room[];
 
-	@Field(() => [HospitalRegister])
-	@OneToMany(() => HospitalRegister, ({ hospital }) => hospital, { cascade: true })
-	register: HospitalRegister[];
+	@Field(() => [HospRegister])
+	@OneToMany(() => HospRegister, ({ hospital }) => hospital, { cascade: true })
+	register: HospRegister[];
+
+	@Field(() => Admin)
+	@ManyToOne(() => Admin, ({ hospitals }) => hospitals)
+	@JoinColumn({ name: "adminId", referencedColumnName: "userId" })
+	admin: Admin;
 }

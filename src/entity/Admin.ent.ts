@@ -7,13 +7,12 @@ import {
 	OneToOne,
 	PrimaryColumn,
 } from "typeorm";
-import { Appointment } from "./Appointment.ent";
-import { TestResult } from "./TestResult.ent";
+import { Hospital } from "./Hospital.ent";
 import { User } from "./User.ent";
 
 @ObjectType()
 @Entity()
-export class Patient {
+export class Admin {
 	@Field(() => ID)
 	@PrimaryColumn({ type: "uuid" })
 	userId: string;
@@ -31,13 +30,10 @@ export class Patient {
 	pincode?: string;
 
 	@Field(() => User)
-	@OneToOne(() => User, ({ asPatient }) => asPatient)
+	@OneToOne(() => User, ({ asAdmin }) => asAdmin)
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
 	user: User;
 
-	@OneToMany(() => Appointment, ({ patient }) => patient, { cascade: true })
-	appointments: Appointment[];
-
-	@OneToOne(() => TestResult, ({ patient }) => patient)
-	testResult: TestResult;
+	@OneToMany(() => Hospital, ({ admin }) => admin)
+	hospitals: Hospital[];
 }

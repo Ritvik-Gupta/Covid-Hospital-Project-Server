@@ -1,10 +1,11 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Doctor } from "./Doctor.ent";
-import { HospitalRegister } from "./HospitalRegister.ent";
+import { HospRegister } from "./HospRegister.ent";
 import { Patient } from "./Patient.ent";
 import { Staff } from "./Staff.ent";
-import { userRoles } from "../service/customTypes";
+import { UserRoles } from "../service/customTypes";
+import { Admin } from "./Admin.ent";
 
 @ObjectType()
 @Entity()
@@ -29,12 +30,12 @@ export class User {
 	@Column({ type: "varchar", unique: true })
 	email: string;
 
-	@Field(() => String)
-	@Column({ type: "enum", enum: userRoles })
-	role: userRoles;
+	@Field(() => UserRoles)
+	@Column({ type: "enum", enum: UserRoles })
+	role: UserRoles;
 
 	@Column({ type: "varchar" })
-	hashPassword: string;
+	password: string;
 
 	@OneToOne(() => Patient, ({ user }) => user)
 	asPatient: Patient;
@@ -45,6 +46,9 @@ export class User {
 	@OneToOne(() => Staff, ({ user }) => user)
 	asStaff: Staff;
 
-	@OneToOne(() => HospitalRegister, ({ user }) => user)
-	registeredAt: HospitalRegister;
+	@OneToOne(() => Admin, ({ user }) => user)
+	asAdmin: Admin;
+
+	@OneToOne(() => HospRegister, ({ user }) => user)
+	registeredAt: HospRegister;
 }

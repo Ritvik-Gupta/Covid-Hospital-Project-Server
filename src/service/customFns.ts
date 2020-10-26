@@ -1,29 +1,32 @@
 import { GraphQLError } from "graphql";
 import { AuthChecker } from "type-graphql";
-import { getRepository } from "typeorm";
-import { User } from "../entity/User.ent";
+import { getCustomRepository } from "typeorm";
+import { UserRepository } from "../repository/User.rep";
 import {
 	customCtx,
 	customGQLError,
 	customGQLExtension,
-	userRoles,
+	UserRoles,
 } from "./customTypes";
 
 export const customFormatError = (error: GraphQLError): customGQLError => ({
 	message: error.message,
-	validationErrors: (error.extensions as customGQLExtension).exception.validationErrors?.map(
-		({ property, constraints }) => ({ property, constraints })
-	),
+	exception: {
+		validationErrors: (error.extensions as customGQLExtension).exception.validationErrors?.map(
+			({ property, constraints }) => ({ property, constraints })
+		),
+	},
 });
 
-export const customAuthChecker: AuthChecker<customCtx, userRoles> = async (
+export const customAuthChecker: AuthChecker<customCtx, UserRoles> = async (
 	{ context: { req } },
 	allowedRoles
 ) => {
 	if (req.session.userId === undefined) return false;
-	const user = await getRepository(User).findOne({
-		where: { id: req.session.userId },
-	});
-	if (user === undefined) return false;
-	return allowedRoles.length === 0 || allowedRoles.includes(user.role);
+	try {
+		const user = await getCustomRepository(UserRepository).isDef(req.session.userId);
+		return allowedRoles.length === 0 || allowedRoles.includes(user.role);
+	} catch (err) {
+		return false;
+	}
 };

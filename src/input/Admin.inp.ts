@@ -1,9 +1,9 @@
 import { IsNumberString, Length, MaxLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
-import { Patient } from "../entity/Patient.ent";
+import { Admin } from "../entity/Admin.ent";
 
 @InputType()
-export class PatientInput implements Partial<Patient> {
+export class AdminInput implements Partial<Admin> {
 	@Field(() => String)
 	@MaxLength(30)
 	state: string;

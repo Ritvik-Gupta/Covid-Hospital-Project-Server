@@ -3,19 +3,18 @@ import { Service } from "typedi";
 import { EntityRepository, Repository } from "typeorm";
 import { User } from "../entity/User.ent";
 import { UserInput } from "../input/User.inp";
-import { userRoles } from "../service/customTypes";
+import { UserRoles } from "../service/customTypes";
 
 @Service()
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-	async isDef(userId: string): Promise<User> {
-		const user = await this.findOne({ where: { id: userId } });
-		if (user === undefined) throw new Error("No such User exists");
-		return user;
-	}
-
-	async isDefWithEmail(email: string): Promise<User> {
-		const user = await this.findOne({ where: { email } });
+	async isDef(
+		check: string,
+		{ withEmail }: { withEmail: boolean } = { withEmail: false }
+	): Promise<User> {
+		const user = await this.findOne({
+			where: withEmail === true ? { email: check } : { id: check },
+		});
 		if (user === undefined) throw new Error("No such User exists");
 		return user;
 	}
@@ -27,9 +26,11 @@ export class UserRepository extends Repository<User> {
 
 	async createAndReturn(
 		{ password, ...userInp }: UserInput,
-		role: userRoles
+		role: UserRoles
 	): Promise<User> {
 		const hashPassword = await hash(password);
-		return await this.save(this.create({ ...userInp, hashPassword, role }));
+		return await this.save(
+			this.create({ ...userInp, password: hashPassword, role })
+		);
 	}
 }
