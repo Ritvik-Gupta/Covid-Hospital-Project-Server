@@ -43,7 +43,7 @@ export class HospitalResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("hospital", () => HospitalInput) hospInp: HospitalInput
 	): Promise<boolean> {
-		await this.hospitalRepo.isNotDef(hospInp.name);
+		await this.hospitalRepo.isNotDef(hospInp.name, { withName: true });
 		await this.hospitalRepo.insert({ ...hospInp, adminId: req.session.userId });
 		return true;
 	}
