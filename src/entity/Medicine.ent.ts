@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { PrescribedMed } from "./PrescribedMed.ent";
 
 @ObjectType()
 @Entity()
@@ -11,4 +12,7 @@ export class Medicine {
 	@Field(() => String)
 	@Column({ type: "varchar", length: 200 })
 	description: string;
+
+	@OneToMany(() => PrescribedMed, ({ medicine }) => medicine)
+	prescribedTo: PrescribedMed[];
 }

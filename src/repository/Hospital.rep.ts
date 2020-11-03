@@ -1,6 +1,7 @@
 import { Service } from "typedi";
 import { EntityRepository, Repository } from "typeorm";
 import { Hospital } from "../entity/Hospital.ent";
+import { getFieldPaths, normalizeFieldObject } from "../service/normalizeInfo";
 
 @Service()
 @EntityRepository(Hospital)
@@ -30,5 +31,16 @@ export class HospitalRepository extends Repository<Hospital> {
 		const hospital = await this.isDef(hospitalId);
 		if (hospital.adminId !== adminId)
 			throw new Error("Hospital does not belong to the Admin");
+	}
+
+	async fetchAll(fieldObject: normalizeFieldObject): Promise<Hospital[]> {
+		const fieldPaths = getFieldPaths(fieldObject);
+		const query = this.createQueryBuilder(fieldPaths.parents[0]);
+
+		fieldPaths.joins.forEach(([parent, child]) => {
+			query.leftJoinAndSelect(`${parent}.${child}`, child);
+		});
+
+		return query.getMany();
 	}
 }

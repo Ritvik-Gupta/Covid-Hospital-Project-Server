@@ -6,10 +6,10 @@ import { HospRegister } from "../entity/HospRegister.ent";
 @EntityRepository(HospRegister)
 export class HospRegisterRepository extends Repository<HospRegister> {
 	async isDef(userId: string): Promise<HospRegister> {
-		const register = await this.findOne({ where: { userId } });
-		if (register === undefined)
-			throw new Error("User is not Registered in any Hospital");
-		return register;
+		const record = await this.findOne({ where: { userId } });
+		if (record === undefined)
+			throw new Error("User is not Registered to any Hospital");
+		return record;
 	}
 
 	async isNotDef(userId: string): Promise<void> {
@@ -17,10 +17,11 @@ export class HospRegisterRepository extends Repository<HospRegister> {
 		if (check !== 0) throw new Error("User Already Registered To a Hospital");
 	}
 
-	async areInSameHosp(user1Id: string, user2Id: string): Promise<void> {
-		const register1 = await this.isDef(user1Id);
-		const register2 = await this.isDef(user2Id);
-		if (register1.hospitalId !== register2.hospitalId)
+	async areInSameHosp(userId_A: string, userId_B: string): Promise<string> {
+		const record_A = await this.isDef(userId_A);
+		const record_B = await this.isDef(userId_B);
+		if (record_A.hospitalId !== record_B.hospitalId)
 			throw new Error("Users don't belong to the same Hospital");
+		return record_A.hospitalId;
 	}
 }

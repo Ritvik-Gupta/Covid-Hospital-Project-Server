@@ -25,7 +25,7 @@ export class HospRegister {
 	@CreateDateColumn()
 	joinDate: Date;
 
-	@ManyToOne(() => Hospital, ({ register }) => register)
+	@ManyToOne(() => Hospital, ({ records }) => records)
 	@JoinColumn({ name: "hospitalId", referencedColumnName: "id" })
 	hospital: Hospital;
 

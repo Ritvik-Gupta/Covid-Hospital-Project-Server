@@ -49,7 +49,7 @@ export class Hospital {
 
 	@Field(() => [HospRegister])
 	@OneToMany(() => HospRegister, ({ hospital }) => hospital, { cascade: true })
-	register: HospRegister[];
+	records: HospRegister[];
 
 	@Field(() => Admin)
 	@ManyToOne(() => Admin, ({ hospitals }) => hospitals)

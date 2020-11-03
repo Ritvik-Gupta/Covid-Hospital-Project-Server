@@ -3,16 +3,15 @@ import {
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
-	ManyToOne,
 	OneToOne,
 	PrimaryColumn,
 } from "typeorm";
-import { BedRegister } from "./BedRegister.ent";
-import { Room } from "./Room.ent";
+import { Bed } from "./Bed.ent";
+import { Patient } from "./Patient.ent";
 
 @ObjectType()
 @Entity()
-export class Bed {
+export class BedRegister {
 	@Field(() => ID)
 	@PrimaryColumn({ type: "mediumint" })
 	bedNo: number;
@@ -25,17 +24,25 @@ export class Bed {
 	@PrimaryColumn({ type: "uuid" })
 	hospitalId: string;
 
+	@Field(() => ID)
+	@PrimaryColumn({ type: "uuid" })
+	patientId: string;
+
 	@Field(() => Date)
 	@CreateDateColumn()
-	createDate: Date;
+	occupiedAtDate: Date;
 
-	@ManyToOne(() => Room, ({ beds }) => beds)
+	@Field(() => Bed)
+	@OneToOne(() => Bed, ({ records }) => records)
 	@JoinColumn([
+		{ name: "bedNo", referencedColumnName: "bedNo" },
 		{ name: "roomNo", referencedColumnName: "roomNo" },
 		{ name: "hospitalId", referencedColumnName: "hospitalId" },
 	])
-	inRoom: Room;
+	bed: Bed;
 
-	@OneToOne(() => BedRegister, ({ bed }) => bed, { cascade: true })
-	records: BedRegister;
+	@Field(() => Patient)
+	@OneToOne(() => Patient, ({ occupiedBed }) => occupiedBed)
+	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
+	patient: Patient;
 }

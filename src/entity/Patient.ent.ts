@@ -8,6 +8,8 @@ import {
 	PrimaryColumn,
 } from "typeorm";
 import { Appointment } from "./Appointment.ent";
+import { BedRegister } from "./BedRegister.ent";
+import { PrescribedMed } from "./PrescribedMed.ent";
 import { TestResult } from "./TestResult.ent";
 import { User } from "./User.ent";
 
@@ -35,9 +37,15 @@ export class Patient {
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
 	user: User;
 
+	@OneToOne(() => TestResult, ({ patient }) => patient, { cascade: true })
+	testResult: TestResult;
+
+	@OneToOne(() => BedRegister, ({ patient }) => patient, { cascade: true })
+	occupiedBed: BedRegister;
+
 	@OneToMany(() => Appointment, ({ patient }) => patient, { cascade: true })
 	appointments: Appointment[];
 
-	@OneToOne(() => TestResult, ({ patient }) => patient)
-	testResult: TestResult;
+	@OneToMany(() => PrescribedMed, ({ patient }) => patient, { cascade: true })
+	prescribedMeds: PrescribedMed[];
 }
