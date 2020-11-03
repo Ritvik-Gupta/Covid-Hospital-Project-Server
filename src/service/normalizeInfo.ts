@@ -5,9 +5,7 @@ export interface normalizeFieldObject {
 	[key: string]: true | normalizeFieldObject;
 }
 
-export type normalizeFieldType = (node: FieldNode) => normalizeFieldObject;
-
-export const normalizeField: normalizeFieldType = node => ({
+const normalizeField = (node: FieldNode): normalizeFieldObject => ({
 	[node.name.value]:
 		node.selectionSet === undefined
 			? true
@@ -17,26 +15,31 @@ export const normalizeField: normalizeFieldType = node => ({
 			  ),
 });
 
-export type normalizeInfoType = (info: GraphQLResolveInfo) => normalizeFieldObject;
-
-export const normalizeInfo: normalizeInfoType = info =>
+export const normalizeInfo = (info: GraphQLResolveInfo): normalizeFieldObject =>
 	info.fieldNodes.reduce((coll, cur) => ({ ...coll, ...normalizeField(cur) }), {});
 
 export const FieldObject = (): ParameterDecorator =>
 	createParamDecorator(({ info }) => normalizeInfo(info));
 
-export type path = [string, string];
+type path = [string, string];
 
-export interface fieldPaths {
+interface fieldPathsReduced {
 	parents: string[];
 	joins: path[];
 }
 
-export const getFieldPaths = (fieldObject: normalizeFieldObject): fieldPaths =>
-	Object.entries(fieldObject).reduce<fieldPaths>(
+export interface fieldPaths {
+	parent: string;
+	joins: path[];
+}
+
+export const reduceFieldPath = (
+	fieldObject: normalizeFieldObject
+): fieldPathsReduced =>
+	Object.entries(fieldObject).reduce<fieldPathsReduced>(
 		(coll, [key, value]) => {
 			if (value === true) return coll;
-			const { parents, joins } = getFieldPaths(value);
+			const { parents, joins } = reduceFieldPath(value);
 			return {
 				parents: [...coll.parents, key],
 				joins: [
@@ -48,3 +51,8 @@ export const getFieldPaths = (fieldObject: normalizeFieldObject): fieldPaths =>
 		},
 		{ parents: [], joins: [] }
 	);
+
+export const getFieldPaths = (fieldObject: normalizeFieldObject): fieldPaths => {
+	const { parents, joins } = reduceFieldPath(fieldObject);
+	return { parent: parents[0], joins };
+};

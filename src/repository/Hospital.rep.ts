@@ -35,12 +35,10 @@ export class HospitalRepository extends Repository<Hospital> {
 
 	async fetchAll(fieldObject: normalizeFieldObject): Promise<Hospital[]> {
 		const fieldPaths = getFieldPaths(fieldObject);
-		const query = this.createQueryBuilder(fieldPaths.parents[0]);
-
+		const query = this.createQueryBuilder(fieldPaths.parent);
 		fieldPaths.joins.forEach(([parent, child]) => {
 			query.leftJoinAndSelect(`${parent}.${child}`, child);
 		});
-
 		return query.getMany();
 	}
 }
