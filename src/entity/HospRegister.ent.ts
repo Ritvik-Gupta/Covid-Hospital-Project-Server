@@ -27,14 +27,14 @@ export class HospRegister {
 	@CreateDateColumn()
 	joinDate: Date;
 
-	@ManyToOne(() => Hospital, ({ records }) => records)
+	@ManyToOne(() => Hospital, ({ userRecords }) => userRecords)
 	@JoinColumn({ name: "hospitalId", referencedColumnName: "id" })
-	hospital: Hospital;
+	forHospital: Hospital;
 
 	@Field(() => User)
 	@OneToOne(() => User, ({ registeredAt }) => registeredAt)
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
-	user: User;
+	forUser: User;
 
 	@OneToMany(() => CovidRegister, ({ forRecord }) => forRecord)
 	hasCovid: CovidRegister;

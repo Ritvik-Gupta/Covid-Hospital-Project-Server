@@ -24,4 +24,12 @@ export class HospitalResolver {
 	): Promise<Hospital | undefined> {
 		return this.hospitalRepo.fetchOne(hospitalId, fieldObject);
 	}
+
+	// @Query(() => Hospital, { nullable: true })
+	// hospitalCovidPatients(
+	// 	@FieldObject() fieldObject: normalizeFieldObject,
+	// 	@Arg("hospitalId", () => String) hospitalId: string
+	// ): Promise<Hospital | undefined> {
+	// 	return this.hospitalRepo.fetchOne(hospitalId, fieldObject);
+	// }
 }

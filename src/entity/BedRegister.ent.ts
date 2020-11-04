@@ -33,16 +33,16 @@ export class BedRegister {
 	occupiedAtDate: Date;
 
 	@Field(() => Bed)
-	@OneToOne(() => Bed, ({ records }) => records)
+	@OneToOne(() => Bed, ({ bedRecords }) => bedRecords)
 	@JoinColumn([
 		{ name: "bedNo", referencedColumnName: "bedNo" },
 		{ name: "roomNo", referencedColumnName: "roomNo" },
 		{ name: "hospitalId", referencedColumnName: "hospitalId" },
 	])
-	bed: Bed;
+	forBed: Bed;
 
 	@Field(() => Patient)
 	@OneToOne(() => Patient, ({ occupiedBed }) => occupiedBed)
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
-	patient: Patient;
+	forPatient: Patient;
 }

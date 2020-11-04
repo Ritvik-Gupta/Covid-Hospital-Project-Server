@@ -1,19 +1,24 @@
-import { IsNumberString, Length, MaxLength } from "class-validator";
+import { IsNumberString, IsUppercase, Length } from "class-validator";
 import { Field, InputType } from "type-graphql";
 import { Doctor } from "../entity/Doctor.ent";
 
 @InputType()
 export class DoctorInput implements Partial<Doctor> {
 	@Field(() => String)
-	@MaxLength(30)
-	state: string;
+	@Length(5, 50)
+	street: string;
 
 	@Field(() => String)
-	@MaxLength(30)
+	@Length(5, 30)
 	city: string;
 
 	@Field(() => String, { nullable: true })
-	@Length(10, 10)
+	@Length(6, 6)
 	@IsNumberString()
 	pincode?: string;
+
+	@Field(() => String)
+	@Length(2, 10)
+	@IsUppercase()
+	qualifaction: string;
 }

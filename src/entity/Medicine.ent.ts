@@ -13,6 +13,6 @@ export class Medicine {
 	@Column({ type: "varchar", length: 200 })
 	description: string;
 
-	@OneToMany(() => PrescribedMed, ({ medicine }) => medicine)
+	@OneToMany(() => PrescribedMed, ({ prescribedMed }) => prescribedMed)
 	prescribedTo: PrescribedMed[];
 }

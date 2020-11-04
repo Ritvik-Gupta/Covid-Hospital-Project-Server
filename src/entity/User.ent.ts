@@ -4,7 +4,7 @@ import { Doctor } from "./Doctor.ent";
 import { HospRegister } from "./HospRegister.ent";
 import { Patient } from "./Patient.ent";
 import { Staff } from "./Staff.ent";
-import { UserRoles } from "../service/customTypes";
+import { Gender, UserRoles } from "../service/customTypes";
 import { Admin } from "./Admin.ent";
 
 @ObjectType()
@@ -26,6 +26,10 @@ export class User {
 	@Column({ type: "varchar", length: 30 })
 	lastName: string;
 
+	@Field(() => Gender)
+	@Column({ type: "enum", enum: Gender })
+	gender: Gender;
+
 	@Field(() => String)
 	@Column({ type: "varchar", unique: true })
 	email: string;
@@ -37,18 +41,18 @@ export class User {
 	@Column({ type: "varchar" })
 	password: string;
 
-	@OneToOne(() => Patient, ({ user }) => user)
+	@OneToOne(() => Patient, ({ asUser }) => asUser)
 	asPatient: Patient;
 
-	@OneToOne(() => Doctor, ({ user }) => user)
+	@OneToOne(() => Doctor, ({ asUser }) => asUser)
 	asDoctor: Doctor;
 
-	@OneToOne(() => Staff, ({ user }) => user)
+	@OneToOne(() => Staff, ({ asUser }) => asUser)
 	asStaff: Staff;
 
-	@OneToOne(() => Admin, ({ user }) => user)
+	@OneToOne(() => Admin, ({ asUser }) => asUser)
 	asAdmin: Admin;
 
-	@OneToOne(() => HospRegister, ({ user }) => user)
+	@OneToOne(() => HospRegister, ({ forUser }) => forUser)
 	registeredAt: HospRegister;
 }

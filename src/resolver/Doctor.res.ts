@@ -43,10 +43,10 @@ export class DoctorResolver {
 	): Promise<boolean> {
 		await this.patientRepo.isDef(patientId);
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
-		for (let medName of medicineNames) {
-			await this.medicineRepo.isDef(medName);
-			await this.prescribedMedRepo.isNotDef(patientId, medName);
-			await this.prescribedMedRepo.insert({ patientId, medName });
+		for (const medicineName of medicineNames) {
+			await this.medicineRepo.isDef(medicineName);
+			await this.prescribedMedRepo.isNotDef(patientId, medicineName);
+			await this.prescribedMedRepo.insert({ patientId, medicineName });
 		}
 		return true;
 	}

@@ -27,9 +27,9 @@ export class Room {
 
 	@Field(() => [Bed])
 	@OneToMany(() => Bed, ({ inRoom }) => inRoom, { cascade: true })
-	beds: Bed[];
+	hasBeds: Bed[];
 
-	@ManyToOne(() => Hospital, ({ rooms }) => rooms)
+	@ManyToOne(() => Hospital, ({ hasRooms }) => hasRooms)
 	@JoinColumn({ name: "hospitalId", referencedColumnName: "id" })
 	belongsTo: Hospital;
 }

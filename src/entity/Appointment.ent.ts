@@ -26,9 +26,9 @@ export class Appointment {
 
 	@ManyToOne(() => Doctor, ({ appointments }) => appointments)
 	@JoinColumn({ name: "doctorId", referencedColumnName: "userId" })
-	doctor: Doctor;
+	withDoctor: Doctor;
 
 	@ManyToOne(() => Patient, ({ appointments }) => appointments)
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
-	patient: Patient;
+	withPatient: Patient;
 }

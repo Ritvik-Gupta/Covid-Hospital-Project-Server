@@ -21,5 +21,5 @@ export class TestResult {
 	@Field(() => Patient)
 	@OneToOne(() => Patient, ({ testResult }) => testResult)
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
-	patient: Patient;
+	forPatient: Patient;
 }

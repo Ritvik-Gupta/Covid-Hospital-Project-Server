@@ -1,14 +1,14 @@
-import { MaxLength } from "class-validator";
+import { Length } from "class-validator";
 import { Field, InputType } from "type-graphql";
 import { Medicine } from "../entity/Medicine.ent";
 
 @InputType()
 export class MedicineInput implements Partial<Medicine> {
 	@Field(() => String)
-	@MaxLength(50)
+	@Length(5, 50)
 	name: string;
 
 	@Field(() => String)
-	@MaxLength(200)
+	@Length(10, 200)
 	description: string;
 }

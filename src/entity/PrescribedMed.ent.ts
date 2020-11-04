@@ -14,7 +14,7 @@ import { Patient } from "./Patient.ent";
 export class PrescribedMed {
 	@Field(() => String)
 	@PrimaryColumn({ type: "varchar", length: 50 })
-	medName: string;
+	medicineName: string;
 
 	@Field(() => String)
 	@PrimaryColumn({ type: "uuid" })
@@ -25,10 +25,10 @@ export class PrescribedMed {
 	prescriptionDate: Date;
 
 	@ManyToOne(() => Medicine, ({ prescribedTo }) => prescribedTo)
-	@JoinColumn({ name: "medName", referencedColumnName: "name" })
-	medicine: Medicine;
+	@JoinColumn({ name: "medicineName", referencedColumnName: "name" })
+	prescribedMed: Medicine;
 
 	@ManyToOne(() => Patient, ({ prescribedMeds }) => prescribedMeds)
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
-	patient: Patient;
+	forPatient: Patient;
 }

@@ -29,13 +29,13 @@ export class Bed {
 	@CreateDateColumn()
 	createDate: Date;
 
-	@ManyToOne(() => Room, ({ beds }) => beds)
+	@ManyToOne(() => Room, ({ hasBeds }) => hasBeds)
 	@JoinColumn([
 		{ name: "roomNo", referencedColumnName: "roomNo" },
 		{ name: "hospitalId", referencedColumnName: "hospitalId" },
 	])
 	inRoom: Room;
 
-	@OneToOne(() => BedRegister, ({ bed }) => bed, { cascade: true })
-	records: BedRegister;
+	@OneToOne(() => BedRegister, ({ forBed }) => forBed, { cascade: true })
+	bedRecords: BedRegister;
 }
