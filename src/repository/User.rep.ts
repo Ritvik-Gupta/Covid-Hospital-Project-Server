@@ -26,7 +26,7 @@ export class UserRepository extends Repository<User> {
 		const [, check] = await this.findAndCount({
 			where: withEmail === true ? { email: checkParam } : { id: checkParam },
 		});
-		if (check !== 0) throw new Error("User Already Registered");
+		if (check !== 0) throw new Error("User Already Registered with the Email");
 	}
 
 	async createAndReturn(

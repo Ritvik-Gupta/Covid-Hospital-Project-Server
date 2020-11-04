@@ -65,7 +65,7 @@ export class UserResolver {
 		@Arg("staff", () => StaffInput) staffInp: StaffInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email);
+		await this.userRepo.isNotDef(userInp.email, { withEmail: true });
 		const user = await this.userRepo.createAndReturn(userInp, UserRoles.STAFF);
 		await this.staffRepo.insert({ ...staffInp, user });
 		req.session.userId = user.id;
@@ -79,7 +79,7 @@ export class UserResolver {
 		@Arg("doctor", () => DoctorInput) doctorInp: DoctorInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email);
+		await this.userRepo.isNotDef(userInp.email, { withEmail: true });
 		const user = await this.userRepo.createAndReturn(userInp, UserRoles.DOCTOR);
 		await this.doctorRepo.insert({ ...doctorInp, user });
 		req.session.userId = user.id;
@@ -93,7 +93,7 @@ export class UserResolver {
 		@Arg("patient", () => PatientInput) patientInp: PatientInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email);
+		await this.userRepo.isNotDef(userInp.email, { withEmail: true });
 		const user = await this.userRepo.createAndReturn(userInp, UserRoles.PATIENT);
 		await this.patientRepo.insert({ ...patientInp, user });
 		req.session.userId = user.id;
@@ -107,7 +107,7 @@ export class UserResolver {
 		@Arg("admin", () => AdminInput) adminInp: AdminInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email);
+		await this.userRepo.isNotDef(userInp.email, { withEmail: true });
 		const user = await this.userRepo.createAndReturn(userInp, UserRoles.ADMIN);
 		await this.adminRepo.insert({ ...adminInp, user });
 		req.session.userId = user.id;

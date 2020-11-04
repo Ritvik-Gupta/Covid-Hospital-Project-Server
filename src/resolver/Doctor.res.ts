@@ -2,11 +2,12 @@ import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { AppointmentRepository } from "../repository/Appointment.rep";
+import { CovidRegisterRepository } from "../repository/CovidRegister.rep";
 import { HospRegisterRepository } from "../repository/HospRegister.rep";
 import { MedicineRepository } from "../repository/Medicine.rep";
 import { PatientRepository } from "../repository/Patient.rep";
 import { PrescribedMedRepository } from "../repository/PrescribedMed.rep";
-import { perfectCtx, UserRoles } from "../service/customTypes";
+import { CovidEntry, perfectCtx, UserRoles } from "../service/customTypes";
 
 @Service()
 @Resolver()
@@ -16,7 +17,8 @@ export class DoctorResolver {
 		@InjectRepository() private readonly medicineRepo: MedicineRepository,
 		@InjectRepository() private readonly appointmentRepo: AppointmentRepository,
 		@InjectRepository() private readonly hospRegisterRepo: HospRegisterRepository,
-		@InjectRepository() private readonly prescribedMedRepo: PrescribedMedRepository
+		@InjectRepository() private readonly prescribedMedRepo: PrescribedMedRepository,
+		@InjectRepository() private readonly covidRegisterRepo: CovidRegisterRepository
 	) {}
 
 	@Mutation(() => Boolean)
@@ -46,6 +48,25 @@ export class DoctorResolver {
 			await this.prescribedMedRepo.isNotDef(patientId, medName);
 			await this.prescribedMedRepo.insert({ patientId, medName });
 		}
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	@Authorized(UserRoles.DOCTOR)
+	async addCovidRecord(
+		@Ctx() { req }: perfectCtx,
+		@Arg("patientId", () => String) patientId: string,
+		@Arg("entry", () => CovidEntry) entry: CovidEntry
+	): Promise<boolean> {
+		if (entry === CovidEntry.AFFECTED)
+			throw new Error("No Patient Test Results Found");
+		await this.patientRepo.isDef(patientId);
+		const hospitalId = await this.hospRegisterRepo.areInSameHosp(
+			req.session.userId,
+			patientId
+		);
+		await this.covidRegisterRepo.checkLastRecord(patientId, CovidEntry.AFFECTED);
+		await this.covidRegisterRepo.insert({ patientId, hospitalId, entry });
 		return true;
 	}
 }

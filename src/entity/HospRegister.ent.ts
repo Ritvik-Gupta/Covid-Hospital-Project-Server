@@ -4,9 +4,11 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
+	OneToMany,
 	OneToOne,
 	PrimaryColumn,
 } from "typeorm";
+import { CovidRegister } from "./CovidRegister.ent";
 import { Hospital } from "./Hospital.ent";
 import { User } from "./User.ent";
 
@@ -33,4 +35,7 @@ export class HospRegister {
 	@OneToOne(() => User, ({ registeredAt }) => registeredAt)
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
 	user: User;
+
+	@OneToMany(() => CovidRegister, ({ forRecord }) => forRecord)
+	hasCovid: CovidRegister;
 }

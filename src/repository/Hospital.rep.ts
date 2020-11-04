@@ -1,7 +1,11 @@
 import { Service } from "typedi";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Hospital } from "../entity/Hospital.ent";
-import { getFieldPaths, normalizeFieldObject } from "../service/normalizeInfo";
+import {
+	fieldPaths,
+	getFieldPaths,
+	normalizeFieldObject,
+} from "../service/normalizeInfo";
 
 @Service()
 @EntityRepository(Hospital)
@@ -34,11 +38,28 @@ export class HospitalRepository extends Repository<Hospital> {
 	}
 
 	async fetchAll(fieldObject: normalizeFieldObject): Promise<Hospital[]> {
-		const fieldPaths = getFieldPaths(fieldObject);
-		const query = this.createQueryBuilder(fieldPaths.parent);
-		fieldPaths.joins.forEach(([parent, child]) => {
+		const fieldPath = getFieldPaths(fieldObject);
+		const query = await this.getPopulatedQuery(fieldPath);
+		return query.getMany();
+	}
+
+	async fetchOne(
+		hospitalId: string,
+		fieldObject: normalizeFieldObject
+	): Promise<Hospital | undefined> {
+		const fieldPath = getFieldPaths(fieldObject);
+		const query = await this.getPopulatedQuery(fieldPath);
+		query.where(`${fieldPath.parent}.id = :hospitalId`, { hospitalId });
+		return query.getOne();
+	}
+
+	private async getPopulatedQuery(
+		fieldPath: fieldPaths
+	): Promise<SelectQueryBuilder<Hospital>> {
+		const query = this.createQueryBuilder(fieldPath.parent);
+		fieldPath.joins.forEach(([parent, child]) => {
 			query.leftJoinAndSelect(`${parent}.${child}`, child);
 		});
-		return query.getMany();
+		return query;
 	}
 }

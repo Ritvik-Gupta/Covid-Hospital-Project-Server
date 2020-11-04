@@ -3,6 +3,7 @@ import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { BedRepository } from "../repository/Bed.rep";
 import { BedRegisterRepository } from "../repository/BedRegister.rep";
+import { CovidRegisterRepository } from "../repository/CovidRegister.rep";
 import { HospRegisterRepository } from "../repository/HospRegister.rep";
 import { PatientRepository } from "../repository/Patient.rep";
 import { RoomRepository } from "../repository/Room.rep";
@@ -18,7 +19,8 @@ export class StaffResolver {
 		@InjectRepository() private readonly patientRepo: PatientRepository,
 		@InjectRepository() private readonly testResultRepo: TestResultRepository,
 		@InjectRepository() private readonly bedRegisterRepo: BedRegisterRepository,
-		@InjectRepository() private readonly hospRegisterRepo: HospRegisterRepository
+		@InjectRepository() private readonly hospRegisterRepo: HospRegisterRepository,
+		@InjectRepository() private readonly covidRegisterRepo: CovidRegisterRepository
 	) {}
 
 	@Mutation(() => Boolean)
@@ -55,10 +57,15 @@ export class StaffResolver {
 		@Arg("reason", () => TestReasons) reason: TestReasons,
 		@Arg("description", () => String, { nullable: true }) description?: string
 	): Promise<boolean> {
-		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.patientRepo.isDef(patientId);
+		const hospitalId = await this.hospRegisterRepo.areInSameHosp(
+			req.session.userId,
+			patientId
+		);
 		await this.testResultRepo.isNotDef(patientId);
 		await this.testResultRepo.insert({ patientId, reason, description });
+		if (reason === TestReasons.COVID)
+			await this.covidRegisterRepo.addAffectedRecord(patientId, hospitalId);
 		return true;
 	}
 

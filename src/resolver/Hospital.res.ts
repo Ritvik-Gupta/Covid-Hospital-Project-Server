@@ -13,22 +13,15 @@ export class HospitalResolver {
 	) {}
 
 	@Query(() => [Hospital])
-	async hospitals(
-		@FieldObject() fieldObject: normalizeFieldObject
-	): Promise<Hospital[]> {
-		return await this.hospitalRepo.fetchAll(fieldObject);
+	hospitals(@FieldObject() fieldObject: normalizeFieldObject): Promise<Hospital[]> {
+		return this.hospitalRepo.fetchAll(fieldObject);
 	}
 
-	@Query(() => Hospital)
-	async hospital(
+	@Query(() => Hospital, { nullable: true })
+	hospital(
+		@FieldObject() fieldObject: normalizeFieldObject,
 		@Arg("hospitalId", () => String) hospitalId: string
-	): Promise<Hospital> {
-		const hospital = await this.hospitalRepo
-			.createQueryBuilder("hospital")
-			.leftJoinAndSelect("hospital.rooms", "rooms")
-			.where("hospital.id = :hospitalId", { hospitalId })
-			.getOne();
-		if (hospital === undefined) throw new Error("No such Hospital exists");
-		return hospital;
+	): Promise<Hospital | undefined> {
+		return this.hospitalRepo.fetchOne(hospitalId, fieldObject);
 	}
 }

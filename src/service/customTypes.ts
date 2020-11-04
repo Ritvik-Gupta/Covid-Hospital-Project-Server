@@ -17,6 +17,13 @@ export enum TestReasons {
 }
 registerEnumType(TestReasons, { name: "TestReasons" });
 
+export enum CovidEntry {
+	AFFECTED = "AFFECTED",
+	RECOVERED = "RECOVERED",
+	DEAD = "DEAD",
+}
+registerEnumType(CovidEntry, { name: "CovidEntry" });
+
 export interface customCtx {
 	req: Request & {
 		session: Express.Session & { userId?: string };
