@@ -2,3 +2,4 @@ node_modules
 ormconfig.txt
 ormconfig.json
 .env
+.vscode
