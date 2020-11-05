@@ -1,6 +1,7 @@
-import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
+import { Hospital } from "../entity/Hospital.ent";
 import { HospitalInput } from "../input/Hospital.inp";
 import { MedicineInput } from "../input/Medicine.inp";
 import { DoctorRepository } from "../repository/Doctor.rep";
@@ -9,6 +10,11 @@ import { HospRegisterRepository } from "../repository/HospRegister.rep";
 import { MedicineRepository } from "../repository/Medicine.rep";
 import { StaffRepository } from "../repository/Staff.rep";
 import { perfectCtx, UserRoles } from "../service/customTypes";
+import {
+	FieldObject,
+	getFieldPaths,
+	normalizeFieldObject,
+} from "../service/normalizeInfo";
 
 @Service()
 @Resolver()
@@ -20,6 +26,21 @@ export class AdminResolver {
 		@InjectRepository() private readonly medicineRepo: MedicineRepository,
 		@InjectRepository() private readonly hospRegisterRepo: HospRegisterRepository
 	) {}
+
+	@Query(() => [Hospital])
+	@Authorized(UserRoles.ADMIN)
+	async ownsHospitals(
+		@Ctx() { req }: perfectCtx,
+		@FieldObject() fieldObject: normalizeFieldObject
+	): Promise<Hospital[]> {
+		const fieldPath = getFieldPaths(fieldObject);
+		const query = await this.hospitalRepo.getPopulatedQuery(fieldPath);
+		return await query
+			.where(`${fieldPath.parent}.adminId = :adminId`, {
+				adminId: req.session.userId,
+			})
+			.getMany();
+	}
 
 	@Mutation(() => Boolean)
 	@Authorized(UserRoles.ADMIN)

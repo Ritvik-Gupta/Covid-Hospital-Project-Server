@@ -5,7 +5,7 @@ import { Hospital } from "../entity/Hospital.ent";
 @InputType()
 export class HospitalInput implements Partial<Hospital> {
 	@Field(() => String)
-	@Length(5, 30)
+	@Length(5, 50)
 	name: string;
 
 	@Field(() => String)

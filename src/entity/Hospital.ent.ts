@@ -25,7 +25,7 @@ export class Hospital extends Address {
 	adminId: string;
 
 	@Field(() => String)
-	@Column({ type: "varchar", length: 30, unique: true })
+	@Column({ type: "varchar", length: 50, unique: true })
 	name: string;
 
 	@Field(() => Date)

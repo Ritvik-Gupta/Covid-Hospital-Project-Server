@@ -1,11 +1,7 @@
 import { Service } from "typedi";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Hospital } from "../entity/Hospital.ent";
-import {
-	fieldPaths,
-	getFieldPaths,
-	normalizeFieldObject,
-} from "../service/normalizeInfo";
+import { normalizedFieldPaths } from "../service/normalizeInfo";
 
 @Service()
 @EntityRepository(Hospital)
@@ -37,24 +33,8 @@ export class HospitalRepository extends Repository<Hospital> {
 			throw new Error("Hospital does not belong to the Admin");
 	}
 
-	async fetchAll(fieldObject: normalizeFieldObject): Promise<Hospital[]> {
-		const fieldPath = getFieldPaths(fieldObject);
-		const query = await this.getPopulatedQuery(fieldPath);
-		return query.getMany();
-	}
-
-	async fetchOne(
-		hospitalId: string,
-		fieldObject: normalizeFieldObject
-	): Promise<Hospital | undefined> {
-		const fieldPath = getFieldPaths(fieldObject);
-		const query = await this.getPopulatedQuery(fieldPath);
-		query.where(`${fieldPath.parent}.id = :hospitalId`, { hospitalId });
-		return query.getOne();
-	}
-
-	private async getPopulatedQuery(
-		fieldPath: fieldPaths
+	async getPopulatedQuery(
+		fieldPath: normalizedFieldPaths
 	): Promise<SelectQueryBuilder<Hospital>> {
 		const query = this.createQueryBuilder(fieldPath.parent);
 		fieldPath.joins.forEach(([parent, child]) => {

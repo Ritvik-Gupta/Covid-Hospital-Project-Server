@@ -1,7 +1,8 @@
 import { Service } from "typedi";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { CovidRegister } from "../entity/CovidRegister.ent";
 import { CovidEntry } from "../service/customTypes";
+import { normalizedFieldPaths } from "../service/normalizeInfo";
 
 @Service()
 @EntityRepository(CovidRegister)
@@ -26,5 +27,15 @@ export class CovidRegisterRepository extends Repository<CovidRegister> {
 	async addAffectedRecord(patientId: string, hospitalId: string): Promise<void> {
 		await this.isNotDef(patientId);
 		await this.insert({ patientId, hospitalId, entry: CovidEntry.AFFECTED });
+	}
+
+	async getPopulatedQuery(
+		fieldPath: normalizedFieldPaths
+	): Promise<SelectQueryBuilder<CovidRegister>> {
+		const query = this.createQueryBuilder(fieldPath.parent);
+		fieldPath.joins.forEach(([parent, child]) => {
+			query.leftJoinAndSelect(`${parent}.${child}`, child);
+		});
+		return query;
 	}
 }
