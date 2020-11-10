@@ -2,12 +2,7 @@ import { GraphQLError } from "graphql";
 import { AuthChecker } from "type-graphql";
 import { getCustomRepository } from "typeorm";
 import { UserRepository } from "../repository/User.rep";
-import {
-	customCtx,
-	customGQLError,
-	customGQLExtension,
-	UserRoles,
-} from "./customTypes";
+import { customCtx, customGQLError, customGQLExtension, UserRoles } from "./customTypes";
 
 export const customFormatError = (error: GraphQLError): customGQLError => ({
 	message: error.message,

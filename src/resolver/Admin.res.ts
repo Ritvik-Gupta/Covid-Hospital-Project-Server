@@ -10,11 +10,7 @@ import { HospRegisterRepository } from "../repository/HospRegister.rep";
 import { MedicineRepository } from "../repository/Medicine.rep";
 import { StaffRepository } from "../repository/Staff.rep";
 import { perfectCtx, UserRoles } from "../service/customTypes";
-import {
-	FieldObject,
-	getFieldPaths,
-	normalizeFieldObject,
-} from "../service/normalizeInfo";
+import { FieldPath, normalizedFieldPaths } from "../service/normalizeInfo";
 
 @Service()
 @Resolver()
@@ -29,16 +25,13 @@ export class AdminResolver {
 
 	@Query(() => [Hospital])
 	@Authorized(UserRoles.ADMIN)
-	async ownsHospitals(
+	ownsHospitals(
 		@Ctx() { req }: perfectCtx,
-		@FieldObject() fieldObject: normalizeFieldObject
+		@FieldPath() fieldPath: normalizedFieldPaths
 	): Promise<Hospital[]> {
-		const fieldPath = getFieldPaths(fieldObject);
-		const query = await this.hospitalRepo.getPopulatedQuery(fieldPath);
-		return await query
-			.where(`${fieldPath.parent}.adminId = :adminId`, {
-				adminId: req.session.userId,
-			})
+		return this.hospitalRepo
+			.getPopulatedQuery(fieldPath)
+			.where(`${fieldPath.parent}.adminId = :adminId`, { adminId: req.session.userId })
 			.getMany();
 	}
 
@@ -48,18 +41,16 @@ export class AdminResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("hospital", () => HospitalInput) hospInp: HospitalInput
 	): Promise<boolean> {
-		await this.hospitalRepo.isNotDef(hospInp.name, { withName: true });
-		await this.hospitalRepo.insert({ ...hospInp, adminId: req.session.userId });
+		await this.hospitalRepo.isNotDef(hospInp.name, { withParam: "name" });
+		await this.hospitalRepo.create(hospInp, req.session.userId);
 		return true;
 	}
 
 	@Mutation(() => Boolean)
 	@Authorized(UserRoles.ADMIN)
-	async addMedicine(
-		@Arg("medicine", () => MedicineInput) medInp: MedicineInput
-	): Promise<boolean> {
+	async addMedicine(@Arg("medicine", () => MedicineInput) medInp: MedicineInput): Promise<boolean> {
 		await this.medicineRepo.isNotDef(medInp.name);
-		await this.medicineRepo.insert(medInp);
+		await this.medicineRepo.create(medInp);
 		return true;
 	}
 
@@ -73,7 +64,7 @@ export class AdminResolver {
 		await this.hospitalRepo.checkAdmin(hospitalId, req.session.userId);
 		await this.staffRepo.isDef(userId);
 		await this.hospRegisterRepo.isNotDef(userId);
-		await this.hospRegisterRepo.insert({ hospitalId, userId });
+		await this.hospRegisterRepo.create(hospitalId, userId);
 		return true;
 	}
 
@@ -87,7 +78,7 @@ export class AdminResolver {
 		await this.hospitalRepo.checkAdmin(hospitalId, req.session.userId);
 		await this.doctorRepo.isDef(userId);
 		await this.hospRegisterRepo.isNotDef(userId);
-		await this.hospRegisterRepo.insert({ hospitalId, userId });
+		await this.hospRegisterRepo.create(hospitalId, userId);
 		return true;
 	}
 }

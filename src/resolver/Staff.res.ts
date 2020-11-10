@@ -31,7 +31,7 @@ export class StaffResolver {
 	): Promise<boolean> {
 		const { hospitalId } = await this.hospRegisterRepo.isDef(req.session.userId);
 		await this.roomRepo.isNotDef(roomNo, hospitalId);
-		await this.roomRepo.insert({ hospitalId, roomNo });
+		await this.roomRepo.create(roomNo, hospitalId);
 		return true;
 	}
 
@@ -45,7 +45,7 @@ export class StaffResolver {
 		const { hospitalId } = await this.hospRegisterRepo.isDef(req.session.userId);
 		await this.roomRepo.isDef(roomNo, hospitalId);
 		await this.bedRepo.isNotDef(bedNo, roomNo, hospitalId);
-		await this.bedRepo.insert({ bedNo, roomNo, hospitalId });
+		await this.bedRepo.create(bedNo, roomNo, hospitalId);
 		return true;
 	}
 
@@ -58,12 +58,9 @@ export class StaffResolver {
 		@Arg("description", () => String, { nullable: true }) description?: string
 	): Promise<boolean> {
 		await this.patientRepo.isDef(patientId);
-		const hospitalId = await this.hospRegisterRepo.areInSameHosp(
-			req.session.userId,
-			patientId
-		);
+		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.testResultRepo.isNotDef(patientId);
-		await this.testResultRepo.insert({ patientId, reason, description });
+		await this.testResultRepo.create(patientId, reason, description);
 		if (reason === TestReasons.COVID)
 			await this.covidRegisterRepo.addAffectedRecord(patientId, hospitalId);
 		return true;
@@ -78,14 +75,11 @@ export class StaffResolver {
 		@Arg("patientId", () => String) patientId: string
 	): Promise<Boolean> {
 		await this.patientRepo.isDef(patientId);
-		const hospitalId = await this.hospRegisterRepo.areInSameHosp(
-			req.session.userId,
-			patientId
-		);
+		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.roomRepo.isDef(roomNo, hospitalId);
 		await this.bedRepo.isDef(bedNo, roomNo, hospitalId);
 		await this.bedRegisterRepo.isNotDef(bedNo, roomNo, hospitalId, patientId);
-		await this.bedRegisterRepo.insert({ bedNo, roomNo, hospitalId, patientId });
+		await this.bedRegisterRepo.create(bedNo, roomNo, hospitalId, patientId);
 		return true;
 	}
 }

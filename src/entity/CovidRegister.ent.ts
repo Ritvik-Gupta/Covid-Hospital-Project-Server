@@ -1,11 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import {
-	CreateDateColumn,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	PrimaryColumn,
-} from "typeorm";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { CovidEntry } from "../service/customTypes";
 import { HospRegister } from "./HospRegister.ent";
 

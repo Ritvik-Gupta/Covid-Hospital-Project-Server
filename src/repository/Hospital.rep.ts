@@ -1,17 +1,18 @@
 import { Service } from "typedi";
-import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
+import { AbstractRepository, EntityRepository, SelectQueryBuilder } from "typeorm";
 import { Hospital } from "../entity/Hospital.ent";
+import { HospitalInput } from "../input/Hospital.inp";
 import { normalizedFieldPaths } from "../service/normalizeInfo";
 
 @Service()
 @EntityRepository(Hospital)
-export class HospitalRepository extends Repository<Hospital> {
+export class HospitalRepository extends AbstractRepository<Hospital> {
 	async isDef(
 		checkParam: string,
-		{ withName }: { withName: boolean } = { withName: false }
+		{ withParam }: { withParam: "id" | "name" } = { withParam: "id" }
 	): Promise<Hospital> {
-		const hospital = await this.findOne({
-			where: withName === true ? { name: checkParam } : { id: checkParam },
+		const hospital = await this.repository.findOne({
+			where: { [withParam]: checkParam },
 		});
 		if (hospital === undefined) throw new Error("No such Hospital exists");
 		return hospital;
@@ -19,24 +20,25 @@ export class HospitalRepository extends Repository<Hospital> {
 
 	async isNotDef(
 		checkParam: string,
-		{ withName }: { withName: boolean } = { withName: false }
+		{ withParam }: { withParam: "id" | "name" } = { withParam: "id" }
 	): Promise<void> {
-		const [, check] = await this.findAndCount({
-			where: withName === true ? { name: checkParam } : { id: checkParam },
+		const [, check] = await this.repository.findAndCount({
+			where: { [withParam]: checkParam },
 		});
 		if (check !== 0) throw new Error("Hospital has already been created");
 	}
 
 	async checkAdmin(hospitalId: string, adminId: string): Promise<void> {
 		const hospital = await this.isDef(hospitalId);
-		if (hospital.adminId !== adminId)
-			throw new Error("Hospital does not belong to the Admin");
+		if (hospital.adminId !== adminId) throw new Error("Hospital does not belong to the Admin");
 	}
 
-	async getPopulatedQuery(
-		fieldPath: normalizedFieldPaths
-	): Promise<SelectQueryBuilder<Hospital>> {
-		const query = this.createQueryBuilder(fieldPath.parent);
+	async create(hospInp: HospitalInput, adminId: string): Promise<void> {
+		await this.repository.insert({ ...hospInp, adminId });
+	}
+
+	getPopulatedQuery(fieldPath: normalizedFieldPaths): SelectQueryBuilder<Hospital> {
+		const query = this.repository.createQueryBuilder(fieldPath.parent);
 		fieldPath.joins.forEach(([parent, child]) => {
 			query.leftJoinAndSelect(`${parent}.${child}`, child);
 		});

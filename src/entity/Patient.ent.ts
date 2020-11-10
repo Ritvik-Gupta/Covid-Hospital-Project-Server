@@ -1,12 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import {
-	Column,
-	Entity,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 import { Address } from "../model/Address.mod";
 import { BloodGroup } from "../service/customTypes";
 import { Appointment } from "./Appointment.ent";

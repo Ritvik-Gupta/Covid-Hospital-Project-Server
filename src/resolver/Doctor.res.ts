@@ -30,7 +30,7 @@ export class DoctorResolver {
 		await this.patientRepo.isDef(patientId);
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.appointmentRepo.isNotDef(req.session.userId, patientId);
-		await this.appointmentRepo.insert({ doctorId: req.session.userId, patientId });
+		await this.appointmentRepo.create(req.session.userId, patientId);
 		return true;
 	}
 
@@ -46,7 +46,7 @@ export class DoctorResolver {
 		for (const medicineName of medicineNames) {
 			await this.medicineRepo.isDef(medicineName);
 			await this.prescribedMedRepo.isNotDef(patientId, medicineName);
-			await this.prescribedMedRepo.insert({ patientId, medicineName });
+			await this.prescribedMedRepo.create(patientId, medicineName);
 		}
 		return true;
 	}
@@ -58,15 +58,11 @@ export class DoctorResolver {
 		@Arg("patientId", () => String) patientId: string,
 		@Arg("entry", () => CovidEntry) entry: CovidEntry
 	): Promise<boolean> {
-		if (entry === CovidEntry.AFFECTED)
-			throw new Error("No Patient Test Results Found");
+		if (entry === CovidEntry.AFFECTED) throw new Error("No Patient Test Results Found");
 		await this.patientRepo.isDef(patientId);
-		const hospitalId = await this.hospRegisterRepo.areInSameHosp(
-			req.session.userId,
-			patientId
-		);
+		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.covidRegisterRepo.checkLastRecord(patientId, CovidEntry.AFFECTED);
-		await this.covidRegisterRepo.insert({ patientId, hospitalId, entry });
+		await this.covidRegisterRepo.create(patientId, hospitalId, entry);
 		return true;
 	}
 }

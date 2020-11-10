@@ -1,12 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import {
-	CreateDateColumn,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from "typeorm";
 import { BedRegister } from "./BedRegister.ent";
 import { Room } from "./Room.ent";
 
@@ -14,11 +7,11 @@ import { Room } from "./Room.ent";
 @Entity()
 export class Bed {
 	@Field(() => ID)
-	@PrimaryColumn({ type: "mediumint" })
+	@PrimaryColumn({ type: "integer" })
 	bedNo: number;
 
 	@Field(() => ID)
-	@PrimaryColumn({ type: "mediumint" })
+	@PrimaryColumn({ type: "integer" })
 	roomNo: number;
 
 	@Field(() => ID)

@@ -21,7 +21,7 @@ export class PatientResolver {
 	): Promise<boolean> {
 		await this.patientRepo.isDef(req.session.userId);
 		await this.hospRegisterRepo.isNotDef(req.session.userId);
-		await this.hospRegisterRepo.insert({ hospitalId, userId: req.session.userId });
+		await this.hospRegisterRepo.create(hospitalId, req.session.userId);
 		return true;
 	}
 }

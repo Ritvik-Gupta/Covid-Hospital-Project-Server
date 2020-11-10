@@ -20,51 +20,41 @@ export class HospitalResolver {
 	) {}
 
 	@Query(() => [Hospital])
-	async hospitals(
-		@FieldPath() fieldPath: normalizedFieldPaths
-	): Promise<Hospital[]> {
-		const query = await this.hospitalRepo.getPopulatedQuery(fieldPath);
-		return await query.getMany();
+	hospitals(@FieldPath() fieldPath: normalizedFieldPaths): Promise<Hospital[]> {
+		return this.hospitalRepo.getPopulatedQuery(fieldPath).getMany();
 	}
 
 	@Query(() => Hospital, { nullable: true })
-	async hospital(
+	hospital(
 		@FieldPath() fieldPath: normalizedFieldPaths,
 		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<Hospital | undefined> {
-		const query = await this.hospitalRepo.getPopulatedQuery(fieldPath);
-		query.where(`${fieldPath.parent}.id = :hospitalId`, { hospitalId });
-		return await query.getOne();
+		return this.hospitalRepo
+			.getPopulatedQuery(fieldPath)
+			.where(`${fieldPath.parent}.id = :hospitalId`, { hospitalId })
+			.getOne();
 	}
 
 	@Query(() => HospRegister, { nullable: true })
 	@Authorized()
-	async registeredAtHospital(
+	registeredAtHospital(
 		@Ctx() { req }: perfectCtx,
 		@FieldPath() fieldPath: normalizedFieldPaths
 	): Promise<HospRegister | undefined> {
-		const query = await this.hospRegisterRepo.getPopulatedQuery(fieldPath);
-		return await query
+		return this.hospRegisterRepo
+			.getPopulatedQuery(fieldPath)
 			.where(`${fieldPath.parent}.userId = :userId`, { userId: req.session.userId })
 			.getOne();
 	}
 
 	@Query(() => [CovidRegister], { nullable: true })
-	async covidPatientsInHospital(
+	covidPatientsInHospital(
 		@FieldPath() fieldPath: normalizedFieldPaths,
 		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<CovidRegister[]> {
-		const query = await this.covidRegisterRepo.getPopulatedQuery(fieldPath);
-		return await query
+		return this.covidRegisterRepo
+			.getPopulatedQuery(fieldPath)
 			.where(`${fieldPath.parent}.hospitalId = :hospitalId`, { hospitalId })
 			.getMany();
 	}
-
-	// @Query(() => Hospital, { nullable: true })
-	// hospitalCovidPatients(
-	// 	@FieldObject() fieldObject: normalizeFieldObject,
-	// 	@Arg("hospitalId", () => String) hospitalId: string
-	// ): Promise<Hospital | undefined> {
-	// 	return this.hospitalRepo.fetchOne(hospitalId, fieldObject);
-	// }
 }

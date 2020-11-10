@@ -1,11 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import {
-	CreateDateColumn,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	PrimaryColumn,
-} from "typeorm";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Doctor } from "./Doctor.ent";
 import { Patient } from "./Patient.ent";
 
