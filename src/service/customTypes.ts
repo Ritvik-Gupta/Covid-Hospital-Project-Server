@@ -1,5 +1,6 @@
 import { ValidationError } from "class-validator";
 import { Request, Response } from "express";
+import { Session } from "express-session";
 import { registerEnumType } from "type-graphql";
 
 export enum UserRoles {
@@ -45,19 +46,14 @@ export enum CovidEntry {
 }
 registerEnumType(CovidEntry, { name: "CovidEntry" });
 
-export interface customCtx {
+export interface context<T> {
 	req: Request & {
-		session: Express.Session & { userId?: string };
+		session: Session & { userId: T };
 	};
 	res: Response;
 }
-
-export interface perfectCtx {
-	req: Request & {
-		session: Express.Session & { userId: string };
-	};
-	res: Response;
-}
+export type customCtx = context<string | undefined>;
+export type perfectCtx = context<string>;
 
 export type customGQLExtension = {
 	exception: { validationErrors?: ValidationError[] };

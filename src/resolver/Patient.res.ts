@@ -1,8 +1,8 @@
 import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { HospRegisterRepository } from "../repository/HospRegister.rep";
-import { PatientRepository } from "../repository/Patient.rep";
+import { HospRegisterRepository } from "../entity/HospRegister.ent";
+import { PatientRepository } from "../entity/Patient.ent";
 import { perfectCtx, UserRoles } from "../service/customTypes";
 
 @Service()
@@ -19,9 +19,9 @@ export class PatientResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<boolean> {
-		await this.patientRepo.isDef(req.session.userId);
-		await this.hospRegisterRepo.isNotDef(req.session.userId);
-		await this.hospRegisterRepo.create(hospitalId, req.session.userId);
+		await this.patientRepo.isDef({ userId: req.session.userId });
+		await this.hospRegisterRepo.isNotDef({ userId: req.session.userId });
+		await this.hospRegisterRepo.create({ hospitalId, userId: req.session.userId });
 		return true;
 	}
 }

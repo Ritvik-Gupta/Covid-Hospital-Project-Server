@@ -1,6 +1,8 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Service } from "typedi";
+import { Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 import { Address } from "../model/Address.mod";
+import { customRepository } from "../service/Custom.rep";
 import { Hospital } from "./Hospital.ent";
 import { User } from "./User.ent";
 
@@ -19,3 +21,10 @@ export class Admin extends Address {
 	@OneToMany(() => Hospital, ({ hasAdmin }) => hasAdmin)
 	ownsHospitals: Hospital[];
 }
+
+@Service()
+@EntityRepository(Admin)
+export class AdminRepository extends customRepository<Admin>({
+	ifDefined: "Admin already exists",
+	ifNotDefined: "No such Admin exists",
+}) {}

@@ -49,7 +49,7 @@ export interface normalizedFieldPaths {
 
 export const getFieldPaths = (fieldObject: normalizedFieldObject): normalizedFieldPaths => {
 	const { parents, joins } = reduceFieldPath(fieldObject);
-	return { parent: parents[0], joins };
+	return { parent: parents[0] as string, joins };
 };
 
 export const FieldPath = (): ParameterDecorator =>

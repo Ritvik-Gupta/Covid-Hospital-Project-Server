@@ -1,5 +1,15 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Service } from "typedi";
+import {
+	CreateDateColumn,
+	Entity,
+	EntityRepository,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryColumn,
+} from "typeorm";
+import { customRepository } from "../service/Custom.rep";
 import { Bed } from "./Bed.ent";
 import { Hospital } from "./Hospital.ent";
 
@@ -26,3 +36,10 @@ export class Room {
 	@JoinColumn({ name: "hospitalId", referencedColumnName: "id" })
 	belongsTo: Hospital;
 }
+
+@Service()
+@EntityRepository(Room)
+export class RoomRepository extends customRepository<Room>({
+	ifDefined: "Room already created",
+	ifNotDefined: "No such Room exists",
+}) {}

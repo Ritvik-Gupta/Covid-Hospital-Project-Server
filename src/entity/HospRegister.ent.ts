@@ -1,13 +1,16 @@
 import { Field, ID, ObjectType } from "type-graphql";
+import { Service } from "typedi";
 import {
 	CreateDateColumn,
 	Entity,
+	EntityRepository,
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	OneToOne,
 	PrimaryColumn,
 } from "typeorm";
+import { customRepository } from "../service/Custom.rep";
 import { CovidRegister } from "./CovidRegister.ent";
 import { Hospital } from "./Hospital.ent";
 import { User } from "./User.ent";
@@ -38,4 +41,19 @@ export class HospRegister {
 
 	@OneToMany(() => CovidRegister, ({ forRecord }) => forRecord)
 	hasCovid: CovidRegister;
+}
+
+@Service()
+@EntityRepository(HospRegister)
+export class HospRegisterRepository extends customRepository<HospRegister>({
+	ifDefined: "User Already Registered To a Hospital",
+	ifNotDefined: "User is not Registered to any Hospital",
+}) {
+	async areInSameHosp(userId_A: string, userId_B: string): Promise<string> {
+		const record_A = await this.isDef({ userId: userId_A });
+		const record_B = await this.isDef({ userId: userId_B });
+		if (record_A.hospitalId !== record_B.hospitalId)
+			throw new Error("Users don't belong to the same Hospital");
+		return record_A.hospitalId;
+	}
 }

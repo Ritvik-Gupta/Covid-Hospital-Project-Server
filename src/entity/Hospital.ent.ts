@@ -1,14 +1,17 @@
 import { Field, ID, ObjectType } from "type-graphql";
+import { Service } from "typedi";
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	EntityRepository,
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
 import { Address } from "../model/Address.mod";
+import { customRepository } from "../service/Custom.rep";
 import { Admin } from "./Admin.ent";
 import { HospRegister } from "./HospRegister.ent";
 import { Room } from "./Room.ent";
@@ -44,4 +47,16 @@ export class Hospital extends Address {
 	@ManyToOne(() => Admin, ({ ownsHospitals }) => ownsHospitals)
 	@JoinColumn({ name: "adminId", referencedColumnName: "userId" })
 	hasAdmin: Admin;
+}
+
+@Service()
+@EntityRepository(Hospital)
+export class HospitalRepository extends customRepository<Hospital>({
+	ifDefined: "Hospital has already been created",
+	ifNotDefined: "No such Hospital exists",
+}) {
+	async checkAdmin(hospitalId: string, adminId: string): Promise<void> {
+		const hospital = await this.isDef({ id: hospitalId });
+		if (hospital.adminId !== adminId) throw new Error("Hospital does not belong to the Admin");
+	}
 }

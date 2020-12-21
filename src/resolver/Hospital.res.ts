@@ -4,9 +4,9 @@ import { InjectRepository } from "typeorm-typedi-extensions";
 import { CovidRegister } from "../entity/CovidRegister.ent";
 import { Hospital } from "../entity/Hospital.ent";
 import { HospRegister } from "../entity/HospRegister.ent";
-import { CovidRegisterRepository } from "../repository/CovidRegister.rep";
-import { HospitalRepository } from "../repository/Hospital.rep";
-import { HospRegisterRepository } from "../repository/HospRegister.rep";
+import { CovidRegisterRepository } from "../entity/CovidRegister.ent";
+import { HospitalRepository } from "../entity/Hospital.ent";
+import { HospRegisterRepository } from "../entity/HospRegister.ent";
 import { perfectCtx } from "../service/customTypes";
 import { FieldPath, normalizedFieldPaths } from "../service/normalizeInfo";
 

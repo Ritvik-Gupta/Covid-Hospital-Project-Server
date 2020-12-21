@@ -1,5 +1,7 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { Service } from "typedi";
+import { Column, Entity, EntityRepository, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { customRepository } from "../service/Custom.rep";
 import { TestReasons } from "../service/customTypes";
 import { Patient } from "./Patient.ent";
 
@@ -23,3 +25,10 @@ export class TestResult {
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
 	forPatient: Patient;
 }
+
+@Service()
+@EntityRepository(TestResult)
+export class TestResultRepository extends customRepository<TestResult>({
+	ifDefined: "Test Result already published",
+	ifNotDefined: "Test Result not found",
+}) {}

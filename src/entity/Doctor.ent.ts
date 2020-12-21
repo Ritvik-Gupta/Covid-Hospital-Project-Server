@@ -1,6 +1,16 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Service } from "typedi";
+import {
+	Column,
+	Entity,
+	EntityRepository,
+	JoinColumn,
+	OneToMany,
+	OneToOne,
+	PrimaryColumn,
+} from "typeorm";
 import { Address } from "../model/Address.mod";
+import { customRepository } from "../service/Custom.rep";
 import { Appointment } from "./Appointment.ent";
 import { User } from "./User.ent";
 
@@ -23,3 +33,10 @@ export class Doctor extends Address {
 	@OneToMany(() => Appointment, ({ withDoctor }) => withDoctor, { cascade: true })
 	appointments: Appointment[];
 }
+
+@Service()
+@EntityRepository(Doctor)
+export class DoctorRepository extends customRepository<Doctor>({
+	ifDefined: "Doctor already exists",
+	ifNotDefined: "No such Doctor exists",
+}) {}

@@ -1,12 +1,12 @@
 import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { AppointmentRepository } from "../repository/Appointment.rep";
-import { CovidRegisterRepository } from "../repository/CovidRegister.rep";
-import { HospRegisterRepository } from "../repository/HospRegister.rep";
-import { MedicineRepository } from "../repository/Medicine.rep";
-import { PatientRepository } from "../repository/Patient.rep";
-import { PrescribedMedRepository } from "../repository/PrescribedMed.rep";
+import { AppointmentRepository } from "../entity/Appointment.ent";
+import { CovidRegisterRepository } from "../entity/CovidRegister.ent";
+import { HospRegisterRepository } from "../entity/HospRegister.ent";
+import { MedicineRepository } from "../entity/Medicine.ent";
+import { PatientRepository } from "../entity/Patient.ent";
+import { PrescribedMedRepository } from "../entity/PrescribedMed.ent";
 import { CovidEntry, perfectCtx, UserRoles } from "../service/customTypes";
 
 @Service()
@@ -27,10 +27,10 @@ export class DoctorResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("patientId", () => String) patientId: string
 	): Promise<boolean> {
-		await this.patientRepo.isDef(patientId);
+		await this.patientRepo.isDef({ userId: patientId });
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
-		await this.appointmentRepo.isNotDef(req.session.userId, patientId);
-		await this.appointmentRepo.create(req.session.userId, patientId);
+		await this.appointmentRepo.isNotDef({ doctorId: req.session.userId, patientId });
+		await this.appointmentRepo.create({ doctorId: req.session.userId, patientId });
 		return true;
 	}
 
@@ -41,12 +41,12 @@ export class DoctorResolver {
 		@Arg("patientId", () => String) patientId: string,
 		@Arg("medicines", () => [String]) medicineNames: string[]
 	): Promise<boolean> {
-		await this.patientRepo.isDef(patientId);
+		await this.patientRepo.isDef({ userId: patientId });
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		for (const medicineName of medicineNames) {
-			await this.medicineRepo.isDef(medicineName);
-			await this.prescribedMedRepo.isNotDef(patientId, medicineName);
-			await this.prescribedMedRepo.create(patientId, medicineName);
+			await this.medicineRepo.isDef({ name: medicineName });
+			await this.prescribedMedRepo.isNotDef({ patientId, medicineName });
+			await this.prescribedMedRepo.create({ patientId, medicineName });
 		}
 		return true;
 	}
@@ -59,10 +59,10 @@ export class DoctorResolver {
 		@Arg("entry", () => CovidEntry) entry: CovidEntry
 	): Promise<boolean> {
 		if (entry === CovidEntry.AFFECTED) throw new Error("No Patient Test Results Found");
-		await this.patientRepo.isDef(patientId);
+		await this.patientRepo.isDef({ userId: patientId });
 		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.covidRegisterRepo.checkLastRecord(patientId, CovidEntry.AFFECTED);
-		await this.covidRegisterRepo.create(patientId, hospitalId, entry);
+		await this.covidRegisterRepo.create({ patientId, hospitalId, entry });
 		return true;
 	}
 }

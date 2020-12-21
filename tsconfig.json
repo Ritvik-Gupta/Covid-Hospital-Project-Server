@@ -20,7 +20,8 @@
 		"isolatedModules": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		"jsx": "preserve"
+		"jsx": "preserve",
+		"noUncheckedIndexedAccess": true
 	},
 	"exclude": ["node_modules"],
 	"include": ["./src/**/*.ts"]

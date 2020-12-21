@@ -1,11 +1,13 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, EntityRepository, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Doctor } from "./Doctor.ent";
 import { HospRegister } from "./HospRegister.ent";
 import { Patient } from "./Patient.ent";
 import { Staff } from "./Staff.ent";
 import { Gender, UserRoles } from "../service/customTypes";
 import { Admin } from "./Admin.ent";
+import { Service } from "typedi";
+import { customRepository } from "../service/Custom.rep";
 
 @ObjectType()
 @Entity()
@@ -56,3 +58,10 @@ export class User {
 	@OneToOne(() => HospRegister, ({ forUser }) => forUser)
 	registeredAt: HospRegister;
 }
+
+@Service()
+@EntityRepository(User)
+export class UserRepository extends customRepository<User>({
+	ifDefined: "User Already Registered",
+	ifNotDefined: "No such User exists",
+}) {}

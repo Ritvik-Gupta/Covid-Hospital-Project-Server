@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import { AuthChecker } from "type-graphql";
 import { getCustomRepository } from "typeorm";
-import { UserRepository } from "../repository/User.rep";
+import { UserRepository } from "../entity/User.ent";
 import { customCtx, customGQLError, customGQLExtension, UserRoles } from "./customTypes";
 
 export const customFormatError = (error: GraphQLError): customGQLError => ({
@@ -19,7 +19,7 @@ export const customAuthChecker: AuthChecker<customCtx, UserRoles> = async (
 ) => {
 	if (req.session.userId === undefined) return false;
 	try {
-		const user = await getCustomRepository(UserRepository).isDef(req.session.userId);
+		const user = await getCustomRepository(UserRepository).isDef({ id: req.session.userId });
 		return allowedRoles.length === 0 || allowedRoles.includes(user.role);
 	} catch (err) {
 		return false;

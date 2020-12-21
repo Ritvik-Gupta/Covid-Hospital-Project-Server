@@ -1,4 +1,4 @@
-import { verify } from "argon2";
+import { hash, verify } from "argon2";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
@@ -9,11 +9,11 @@ import { LoginInput } from "../input/Login.inp";
 import { PatientInput } from "../input/Patient.inp";
 import { StaffInput } from "../input/Staff.inp";
 import { UserInput } from "../input/User.inp";
-import { AdminRepository } from "../repository/Admin.rep";
-import { DoctorRepository } from "../repository/Doctor.rep";
-import { PatientRepository } from "../repository/Patient.rep";
-import { StaffRepository } from "../repository/Staff.rep";
-import { UserRepository } from "../repository/User.rep";
+import { AdminRepository } from "../entity/Admin.ent";
+import { DoctorRepository } from "../entity/Doctor.ent";
+import { PatientRepository } from "../entity/Patient.ent";
+import { StaffRepository } from "../entity/Staff.ent";
+import { UserRepository } from "../entity/User.ent";
 import { customCtx, UserRoles } from "../service/customTypes";
 
 @Service()
@@ -30,7 +30,7 @@ export class UserResolver {
 	@Query(() => User)
 	async currentUser(@Ctx() { req }: customCtx): Promise<User> {
 		if (req.session.userId === undefined) throw new Error("No User Is Logged In");
-		const user = await this.userRepo.isDef(req.session.userId);
+		const user = await this.userRepo.isDef({ id: req.session.userId });
 		return user;
 	}
 
@@ -40,7 +40,7 @@ export class UserResolver {
 		@Arg("params", () => LoginInput) { email, password }: LoginInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		const user = await this.userRepo.isDef(email, { withParam: "email" });
+		const user = await this.userRepo.isDef({ email });
 		const isValidPassowrd = await verify(user.password, password);
 		if (isValidPassowrd === false) throw new Error("Invalid Passowrd");
 		req.session.userId = user.id;
@@ -61,13 +61,18 @@ export class UserResolver {
 	@Mutation(() => Boolean)
 	async registerAsStaff(
 		@Ctx() { req }: customCtx,
-		@Arg("user", () => UserInput) userInp: UserInput,
+		@Arg("user", () => UserInput) { password, ...userInp }: UserInput,
 		@Arg("staff", () => StaffInput) staffInp: StaffInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email, { withParam: "email" });
-		const { id } = await this.userRepo.createAndReturn(userInp, UserRoles.STAFF);
-		await this.staffRepo.create(staffInp, id);
+		await this.userRepo.isNotDef({ email: userInp.email });
+		const hashPassword = await hash(password);
+		const { id } = await this.userRepo.create({
+			...userInp,
+			password: hashPassword,
+			role: UserRoles.STAFF,
+		});
+		await this.staffRepo.create({ ...staffInp, userId: id });
 		req.session.userId = id;
 		return true;
 	}
@@ -75,13 +80,18 @@ export class UserResolver {
 	@Mutation(() => Boolean)
 	async registerAsDoctor(
 		@Ctx() { req }: customCtx,
-		@Arg("user", () => UserInput) userInp: UserInput,
+		@Arg("user", () => UserInput) { password, ...userInp }: UserInput,
 		@Arg("doctor", () => DoctorInput) doctorInp: DoctorInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email, { withParam: "email" });
-		const { id } = await this.userRepo.createAndReturn(userInp, UserRoles.DOCTOR);
-		await this.doctorRepo.create(doctorInp, id);
+		await this.userRepo.isNotDef({ email: userInp.email });
+		const hashPassword = await hash(password);
+		const { id } = await this.userRepo.create({
+			...userInp,
+			password: hashPassword,
+			role: UserRoles.DOCTOR,
+		});
+		await this.doctorRepo.create({ ...doctorInp, userId: id });
 		req.session.userId = id;
 		return true;
 	}
@@ -89,13 +99,18 @@ export class UserResolver {
 	@Mutation(() => Boolean)
 	async registerAsPatient(
 		@Ctx() { req }: customCtx,
-		@Arg("user", () => UserInput) userInp: UserInput,
+		@Arg("user", () => UserInput) { password, ...userInp }: UserInput,
 		@Arg("patient", () => PatientInput) patientInp: PatientInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email, { withParam: "email" });
-		const { id } = await this.userRepo.createAndReturn(userInp, UserRoles.PATIENT);
-		await this.patientRepo.create(patientInp, id);
+		await this.userRepo.isNotDef({ email: userInp.email });
+		const hashPassword = await hash(password);
+		const { id } = await this.userRepo.create({
+			...userInp,
+			password: hashPassword,
+			role: UserRoles.PATIENT,
+		});
+		await this.patientRepo.create({ ...patientInp, userId: id });
 		req.session.userId = id;
 		return true;
 	}
@@ -103,13 +118,18 @@ export class UserResolver {
 	@Mutation(() => Boolean)
 	async registerAsAdmin(
 		@Ctx() { req }: customCtx,
-		@Arg("user", () => UserInput) userInp: UserInput,
+		@Arg("user", () => UserInput) { password, ...userInp }: UserInput,
 		@Arg("admin", () => AdminInput) adminInp: AdminInput
 	): Promise<boolean> {
 		if (req.session.userId !== undefined) throw new Error("User already Logged In");
-		await this.userRepo.isNotDef(userInp.email, { withParam: "email" });
-		const { id } = await this.userRepo.createAndReturn(userInp, UserRoles.ADMIN);
-		await this.adminRepo.create(adminInp, id);
+		await this.userRepo.isNotDef({ email: userInp.email });
+		const hashPassword = await hash(password);
+		const { id } = await this.userRepo.create({
+			...userInp,
+			password: hashPassword,
+			role: UserRoles.ADMIN,
+		});
+		await this.adminRepo.create({ ...adminInp, userId: id });
 		req.session.userId = id;
 		return true;
 	}

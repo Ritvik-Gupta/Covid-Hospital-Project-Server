@@ -1,5 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Service } from "typedi";
+import { Column, Entity, EntityRepository, OneToMany, PrimaryColumn } from "typeorm";
+import { customRepository } from "../service/Custom.rep";
 import { PrescribedMed } from "./PrescribedMed.ent";
 
 @ObjectType()
@@ -16,3 +18,10 @@ export class Medicine {
 	@OneToMany(() => PrescribedMed, ({ prescribedMed }) => prescribedMed)
 	prescribedTo: PrescribedMed[];
 }
+
+@Service()
+@EntityRepository(Medicine)
+export class MedicineRepository extends customRepository<Medicine>({
+	ifDefined: "Medicine has already been created",
+	ifNotDefined: "No such Medicine exists",
+}) {}
