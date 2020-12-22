@@ -50,8 +50,8 @@ export class HospRegisterRepository extends customRepository<HospRegister>({
 	ifNotDefined: "User is not Registered to any Hospital",
 }) {
 	async areInSameHosp(userId_A: string, userId_B: string): Promise<string> {
-		const record_A = await this.isDef({ userId: userId_A });
-		const record_B = await this.isDef({ userId: userId_B });
+		const record_A = await this.ifDefined({ userId: userId_A });
+		const record_B = await this.ifDefined({ userId: userId_B });
 		if (record_A.hospitalId !== record_B.hospitalId)
 			throw new Error("Users don't belong to the same Hospital");
 		return record_A.hospitalId;

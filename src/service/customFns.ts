@@ -19,7 +19,7 @@ export const customAuthChecker: AuthChecker<customCtx, UserRoles> = async (
 ) => {
 	if (req.session.userId === undefined) return false;
 	try {
-		const user = await getCustomRepository(UserRepository).isDef({ id: req.session.userId });
+		const user = await getCustomRepository(UserRepository).ifDefined({ id: req.session.userId });
 		return allowedRoles.length === 0 || allowedRoles.includes(user.role);
 	} catch (err) {
 		return false;

@@ -1,4 +1,5 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Length } from "class-validator";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import {
 	Column,
@@ -49,6 +50,13 @@ export class Hospital extends Address {
 	hasAdmin: Admin;
 }
 
+@InputType()
+export class HospitalInput extends Address implements Partial<Hospital> {
+	@Field(() => String)
+	@Length(5, 50)
+	name: string;
+}
+
 @Service()
 @EntityRepository(Hospital)
 export class HospitalRepository extends customRepository<Hospital>({
@@ -56,7 +64,7 @@ export class HospitalRepository extends customRepository<Hospital>({
 	ifNotDefined: "No such Hospital exists",
 }) {
 	async checkAdmin(hospitalId: string, adminId: string): Promise<void> {
-		const hospital = await this.isDef({ id: hospitalId });
+		const hospital = await this.ifDefined({ id: hospitalId });
 		if (hospital.adminId !== adminId) throw new Error("Hospital does not belong to the Admin");
 	}
 }

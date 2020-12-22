@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import { Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 import { Address } from "../model/Address.mod";
@@ -21,6 +21,9 @@ export class Admin extends Address {
 	@OneToMany(() => Hospital, ({ hasAdmin }) => hasAdmin)
 	ownsHospitals: Hospital[];
 }
+
+@InputType()
+export class AdminInput extends Address implements Partial<Admin> {}
 
 @Service()
 @EntityRepository(Admin)

@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import {
 	Column,
@@ -7,7 +7,7 @@ import {
 	JoinColumn,
 	OneToMany,
 	OneToOne,
-	PrimaryColumn,
+	PrimaryColumn
 } from "typeorm";
 import { Address } from "../model/Address.mod";
 import { customRepository } from "../service/Custom.rep";
@@ -45,6 +45,12 @@ export class Patient extends Address {
 
 	@OneToMany(() => PrescribedMed, ({ forPatient }) => forPatient, { cascade: true })
 	prescribedMeds: PrescribedMed[];
+}
+
+@InputType()
+export class PatientInput extends Address implements Partial<Patient> {
+	@Field(() => BloodGroup)
+	bloodGroup: BloodGroup;
 }
 
 @Service()

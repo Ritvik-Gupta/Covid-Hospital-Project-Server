@@ -1,13 +1,14 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { IsEmail, Length } from "class-validator";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
+import { Service } from "typedi";
 import { Column, Entity, EntityRepository, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { customRepository } from "../service/Custom.rep";
+import { Gender, UserRoles } from "../service/customTypes";
+import { Admin } from "./Admin.ent";
 import { Doctor } from "./Doctor.ent";
 import { HospRegister } from "./HospRegister.ent";
 import { Patient } from "./Patient.ent";
 import { Staff } from "./Staff.ent";
-import { Gender, UserRoles } from "../service/customTypes";
-import { Admin } from "./Admin.ent";
-import { Service } from "typedi";
-import { customRepository } from "../service/Custom.rep";
 
 @ObjectType()
 @Entity()
@@ -57,6 +58,34 @@ export class User {
 
 	@OneToOne(() => HospRegister, ({ forUser }) => forUser)
 	registeredAt: HospRegister;
+}
+
+@InputType()
+export class LoginInput implements Partial<User> {
+	@Field(() => String)
+	@IsEmail()
+	email: string;
+
+	@Field(() => String)
+	password: string;
+}
+
+@InputType()
+export class UserInput extends LoginInput implements Partial<User> {
+	@Field(() => String)
+	@Length(1, 30)
+	firstName: string;
+
+	@Field(() => String, { nullable: true })
+	@Length(1, 30)
+	middleName: string;
+
+	@Field(() => String)
+	@Length(1, 30)
+	lastName: string;
+
+	@Field(() => Gender)
+	gender: Gender;
 }
 
 @Service()

@@ -58,7 +58,7 @@ export class CovidRegisterRepository extends customRepository<CovidRegister>({
 	}
 
 	async addAffectedRecord(patientId: string, hospitalId: string): Promise<void> {
-		await this.isNotDef({ patientId });
+		await this.ifNotDefined({ patientId });
 		await this.repository.insert({ patientId, hospitalId, entry: CovidEntry.AFFECTED });
 	}
 }

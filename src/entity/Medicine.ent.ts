@@ -1,4 +1,5 @@
-import { Field, ObjectType } from "type-graphql";
+import { Length } from "class-validator";
+import { Field, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import { Column, Entity, EntityRepository, OneToMany, PrimaryColumn } from "typeorm";
 import { customRepository } from "../service/Custom.rep";
@@ -18,6 +19,19 @@ export class Medicine {
 	@OneToMany(() => PrescribedMed, ({ prescribedMed }) => prescribedMed)
 	prescribedTo: PrescribedMed[];
 }
+
+
+@InputType()
+export class MedicineInput implements Partial<Medicine> {
+	@Field(() => String)
+	@Length(5, 50)
+	name: string;
+
+	@Field(() => String)
+	@Length(10, 200)
+	description: string;
+}
+
 
 @Service()
 @EntityRepository(Medicine)

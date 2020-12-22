@@ -19,8 +19,8 @@ export class PatientResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("hospitalId", () => String) hospitalId: string
 	): Promise<boolean> {
-		await this.patientRepo.isDef({ userId: req.session.userId });
-		await this.hospRegisterRepo.isNotDef({ userId: req.session.userId });
+		await this.patientRepo.ifDefined({ userId: req.session.userId });
+		await this.hospRegisterRepo.ifNotDefined({ userId: req.session.userId });
 		await this.hospRegisterRepo.create({ hospitalId, userId: req.session.userId });
 		return true;
 	}

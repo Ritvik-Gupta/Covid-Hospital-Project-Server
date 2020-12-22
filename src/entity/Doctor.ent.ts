@@ -1,4 +1,5 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { IsUppercase, Length } from "class-validator";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import {
 	Column,
@@ -32,6 +33,14 @@ export class Doctor extends Address {
 
 	@OneToMany(() => Appointment, ({ withDoctor }) => withDoctor, { cascade: true })
 	appointments: Appointment[];
+}
+
+@InputType()
+export class DoctorInput extends Address implements Partial<Doctor> {
+	@Field(() => String)
+	@Length(2, 10)
+	@IsUppercase()
+	qualifaction: string;
 }
 
 @Service()

@@ -25,6 +25,11 @@ import { customAuthChecker, customFormatError } from "./service/customFns";
 				value: false,
 			},
 		},
+		emitSchemaFile: {
+			path: __dirname + "/schema.gql",
+			commentDescriptions: true,
+			sortedSchema: false,
+		},
 	});
 	const apolloServer = new ApolloServer({
 		schema,

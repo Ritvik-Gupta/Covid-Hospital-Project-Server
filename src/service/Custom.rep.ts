@@ -8,13 +8,13 @@ export interface repositoryErrors {
 
 export const customRepository = <T>(repoErrors: repositoryErrors) => {
 	abstract class CustomRepository extends AbstractRepository<T> {
-		async isDef(where: FindConditions<T>): Promise<T> {
+		async ifDefined(where: FindConditions<T>): Promise<T> {
 			const value = await this.repository.findOne({ where });
 			if (value === undefined) throw new Error(repoErrors.ifNotDefined);
 			return value;
 		}
 
-		async isNotDef(where: FindConditions<T>): Promise<void> {
+		async ifNotDefined(where: FindConditions<T>): Promise<void> {
 			const [, check] = await this.repository.findAndCount({ where });
 			if (check > 0) throw new Error(repoErrors.ifDefined);
 		}

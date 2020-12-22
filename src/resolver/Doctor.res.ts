@@ -27,9 +27,9 @@ export class DoctorResolver {
 		@Ctx() { req }: perfectCtx,
 		@Arg("patientId", () => String) patientId: string
 	): Promise<boolean> {
-		await this.patientRepo.isDef({ userId: patientId });
+		await this.patientRepo.ifDefined({ userId: patientId });
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
-		await this.appointmentRepo.isNotDef({ doctorId: req.session.userId, patientId });
+		await this.appointmentRepo.ifNotDefined({ doctorId: req.session.userId, patientId });
 		await this.appointmentRepo.create({ doctorId: req.session.userId, patientId });
 		return true;
 	}
@@ -41,11 +41,11 @@ export class DoctorResolver {
 		@Arg("patientId", () => String) patientId: string,
 		@Arg("medicines", () => [String]) medicineNames: string[]
 	): Promise<boolean> {
-		await this.patientRepo.isDef({ userId: patientId });
+		await this.patientRepo.ifDefined({ userId: patientId });
 		await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		for (const medicineName of medicineNames) {
-			await this.medicineRepo.isDef({ name: medicineName });
-			await this.prescribedMedRepo.isNotDef({ patientId, medicineName });
+			await this.medicineRepo.ifDefined({ name: medicineName });
+			await this.prescribedMedRepo.ifNotDefined({ patientId, medicineName });
 			await this.prescribedMedRepo.create({ patientId, medicineName });
 		}
 		return true;
@@ -59,7 +59,7 @@ export class DoctorResolver {
 		@Arg("entry", () => CovidEntry) entry: CovidEntry
 	): Promise<boolean> {
 		if (entry === CovidEntry.AFFECTED) throw new Error("No Patient Test Results Found");
-		await this.patientRepo.isDef({ userId: patientId });
+		await this.patientRepo.ifDefined({ userId: patientId });
 		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.covidRegisterRepo.checkLastRecord(patientId, CovidEntry.AFFECTED);
 		await this.covidRegisterRepo.create({ patientId, hospitalId, entry });

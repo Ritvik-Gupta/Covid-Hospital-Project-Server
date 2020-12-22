@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Service } from "typedi";
 import { Entity, EntityRepository, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { Address } from "../model/Address.mod";
@@ -17,6 +17,9 @@ export class Staff extends Address {
 	@JoinColumn({ name: "userId", referencedColumnName: "id" })
 	asUser: User;
 }
+
+@InputType()
+export class StaffInput extends Address implements Partial<Staff> {}
 
 @Service()
 @EntityRepository(Staff)
