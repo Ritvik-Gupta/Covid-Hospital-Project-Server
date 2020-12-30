@@ -7,7 +7,7 @@ import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { Container } from "typedi";
 import { createConnection, useContainer } from "typeorm";
-import { customAuthChecker, customFormatError } from "./service/customFns";
+import { customAuthChecker, customFormatError } from "./service/customOptions";
 
 (async () => {
 	dotenv.config();
@@ -15,7 +15,7 @@ import { customAuthChecker, customFormatError } from "./service/customFns";
 	await createConnection();
 
 	const schema = await buildSchema({
-		resolvers: [__dirname + "/resolver/**/*.res.ts"],
+		resolvers: [__dirname + "/resolver/index.ts"],
 		authChecker: customAuthChecker,
 		container: Container,
 		authMode: "error",
@@ -31,6 +31,7 @@ import { customAuthChecker, customFormatError } from "./service/customFns";
 			sortedSchema: false,
 		},
 	});
+
 	const apolloServer = new ApolloServer({
 		schema,
 		context: ({ req, res }) => ({ req, res }),
@@ -63,7 +64,6 @@ import { customAuthChecker, customFormatError } from "./service/customFns";
 	);
 
 	apolloServer.applyMiddleware({ app, cors: false });
-
 	app.listen(process.env.PORT, () => {
 		console.log("\n\nGraphql Server Up and Running on");
 		console.log(`http://localhost:${process.env.PORT}/graphql\n\n`);

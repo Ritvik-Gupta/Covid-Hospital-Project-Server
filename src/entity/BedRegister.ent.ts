@@ -1,14 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	CreateDateColumn,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { customRepository } from "../service/Custom.rep";
+import { CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { Bed } from "./Bed.ent";
 import { Patient } from "./Patient.ent";
 
@@ -49,10 +40,3 @@ export class BedRegister {
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
 	forPatient: Patient;
 }
-
-@Service()
-@EntityRepository(BedRegister)
-export class BedRegisterRepository extends customRepository<BedRegister>({
-	ifDefined: "Bed is currently occupied",
-	ifNotDefined: "Bed is not occupied",
-}) {}

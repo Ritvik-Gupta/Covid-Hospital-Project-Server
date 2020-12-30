@@ -1,9 +1,7 @@
 import { IsEmail, Length } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import { Column, Entity, EntityRepository, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { customRepository } from "../service/Custom.rep";
-import { Gender, UserRoles } from "../service/customTypes";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Gender, UserRoles } from "../service";
 import { Admin } from "./Admin.ent";
 import { Doctor } from "./Doctor.ent";
 import { HospRegister } from "./HospRegister.ent";
@@ -87,10 +85,3 @@ export class UserInput extends LoginInput implements Partial<User> {
 	@Field(() => Gender)
 	gender: Gender;
 }
-
-@Service()
-@EntityRepository(User)
-export class UserRepository extends customRepository<User>({
-	ifDefined: "User Already Registered",
-	ifNotDefined: "No such User exists",
-}) {}

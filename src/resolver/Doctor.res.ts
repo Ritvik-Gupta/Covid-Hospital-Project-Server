@@ -1,13 +1,16 @@
 import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { AppointmentRepository } from "../entity/Appointment.ent";
-import { CovidRegisterRepository } from "../entity/CovidRegister.ent";
-import { HospRegisterRepository } from "../entity/HospRegister.ent";
-import { MedicineRepository } from "../entity/Medicine.ent";
-import { PatientRepository } from "../entity/Patient.ent";
-import { PrescribedMedRepository } from "../entity/PrescribedMed.ent";
-import { CovidEntry, perfectCtx, UserRoles } from "../service/customTypes";
+import {
+	AppointmentRepository,
+	CovidRegisterRepository,
+	HospRegisterRepository,
+	MedicineRepository,
+	PatientRepository,
+	PrescribedMedRepository,
+} from "../repository";
+import { CovidEntry, UserRoles } from "../service/customEnums";
+import { perfectCtx } from "../service/customTypes";
 
 @Service()
 @Resolver()
@@ -58,7 +61,7 @@ export class DoctorResolver {
 		@Arg("patientId", () => String) patientId: string,
 		@Arg("entry", () => CovidEntry) entry: CovidEntry
 	): Promise<boolean> {
-		if (entry === CovidEntry.AFFECTED) throw new Error("No Patient Test Results Found");
+		if (entry === CovidEntry.AFFECTED) throw Error("No Patient Test Results Found");
 		await this.patientRepo.ifDefined({ userId: patientId });
 		const hospitalId = await this.hospRegisterRepo.areInSameHosp(req.session.userId, patientId);
 		await this.covidRegisterRepo.checkLastRecord(patientId, CovidEntry.AFFECTED);

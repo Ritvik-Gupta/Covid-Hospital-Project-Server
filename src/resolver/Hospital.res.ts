@@ -1,9 +1,8 @@
 import { Arg, Authorized, Ctx, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { CovidRegister, CovidRegisterRepository } from "../entity/CovidRegister.ent";
-import { Hospital, HospitalRepository } from "../entity/Hospital.ent";
-import { HospRegister, HospRegisterRepository } from "../entity/HospRegister.ent";
+import { CovidRegister, Hospital, HospRegister } from "../entity";
+import { CovidRegisterRepository, HospitalRepository, HospRegisterRepository } from "../repository";
 import { perfectCtx } from "../service/customTypes";
 import { FieldPath, normalizedFieldPaths } from "../service/normalizeInfo";
 

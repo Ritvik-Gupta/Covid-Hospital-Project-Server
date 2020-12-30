@@ -1,8 +1,9 @@
 import { GraphQLError } from "graphql";
 import { AuthChecker } from "type-graphql";
 import { getCustomRepository } from "typeorm";
-import { UserRepository } from "../entity/User.ent";
-import { customCtx, customGQLError, customGQLExtension, UserRoles } from "./customTypes";
+import { UserRepository } from "../repository";
+import { UserRoles } from "./customEnums";
+import { customCtx, customGQLError, customGQLExtension } from "./customTypes";
 
 export const customFormatError = (error: GraphQLError): customGQLError => ({
 	message: error.message,

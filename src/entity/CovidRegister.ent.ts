@@ -1,15 +1,6 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	CreateDateColumn,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	ManyToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { customRepository } from "../service/Custom.rep";
-import { CovidEntry } from "../service/customTypes";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { CovidEntry } from "../service";
 import { HospRegister } from "./HospRegister.ent";
 
 @ObjectType()
@@ -37,28 +28,4 @@ export class CovidRegister {
 		{ name: "hospitalId", referencedColumnName: "hospitalId" },
 	])
 	forRecord: HospRegister;
-}
-
-@Service()
-@EntityRepository(CovidRegister)
-export class CovidRegisterRepository extends customRepository<CovidRegister>({
-	ifDefined: "Covid Record for the Patient already exists",
-	ifNotDefined: "No Covid Record found for the Patient",
-}) {
-	async checkLastRecord(patientId: string, entry: CovidEntry): Promise<void> {
-		const record = await this.repository
-			.createQueryBuilder("record")
-			.where("record.patientId = :patientId", { patientId })
-			.orderBy("record.entryDate", "DESC")
-			.limit(1)
-			.getOne();
-
-		if (record === undefined) throw new Error("No Record Found for the Patient");
-		if (record.entry !== entry) throw new Error("Invalid Entry provided for the Latest Record");
-	}
-
-	async addAffectedRecord(patientId: string, hospitalId: string): Promise<void> {
-		await this.ifNotDefined({ patientId });
-		await this.repository.insert({ patientId, hospitalId, entry: CovidEntry.AFFECTED });
-	}
 }

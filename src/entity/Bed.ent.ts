@@ -1,15 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	CreateDateColumn,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	ManyToOne,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { customRepository } from "../service/Custom.rep";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from "typeorm";
 import { BedRegister } from "./BedRegister.ent";
 import { Room } from "./Room.ent";
 
@@ -42,10 +32,3 @@ export class Bed {
 	@OneToOne(() => BedRegister, ({ forBed }) => forBed, { cascade: true })
 	bedRecords: BedRegister;
 }
-
-@Service()
-@EntityRepository(Bed)
-export class BedRepository extends customRepository<Bed>({
-	ifDefined: "Bed already created",
-	ifNotDefined: "Information on Bed not found",
-}) {}

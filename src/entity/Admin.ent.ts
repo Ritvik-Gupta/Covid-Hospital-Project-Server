@@ -1,8 +1,6 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import { Entity, EntityRepository, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
-import { Address } from "../model/Address.mod";
-import { customRepository } from "../service/Custom.rep";
+import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Address } from "../model";
 import { Hospital } from "./Hospital.ent";
 import { User } from "./User.ent";
 
@@ -24,10 +22,3 @@ export class Admin extends Address {
 
 @InputType()
 export class AdminInput extends Address implements Partial<Admin> {}
-
-@Service()
-@EntityRepository(Admin)
-export class AdminRepository extends customRepository<Admin>({
-	ifDefined: "Admin already exists",
-	ifNotDefined: "No such Admin exists",
-}) {}

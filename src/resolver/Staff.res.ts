@@ -1,14 +1,17 @@
 import { Arg, Authorized, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { BedRepository } from "../entity/Bed.ent";
-import { BedRegisterRepository } from "../entity/BedRegister.ent";
-import { CovidRegisterRepository } from "../entity/CovidRegister.ent";
-import { HospRegisterRepository } from "../entity/HospRegister.ent";
-import { PatientRepository } from "../entity/Patient.ent";
-import { RoomRepository } from "../entity/Room.ent";
-import { TestResultRepository } from "../entity/TestResult.ent";
-import { perfectCtx, TestReasons, UserRoles } from "../service/customTypes";
+import {
+	BedRegisterRepository,
+	BedRepository,
+	CovidRegisterRepository,
+	HospRegisterRepository,
+	PatientRepository,
+	RoomRepository,
+	TestResultRepository,
+} from "../repository";
+import { TestReasons, UserRoles } from "../service/customEnums";
+import { perfectCtx } from "../service/customTypes";
 
 @Service()
 @Resolver()

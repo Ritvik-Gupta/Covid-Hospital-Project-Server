@@ -1,8 +1,6 @@
 import { Length } from "class-validator";
 import { Field, InputType, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import { Column, Entity, EntityRepository, OneToMany, PrimaryColumn } from "typeorm";
-import { customRepository } from "../service/Custom.rep";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PrescribedMed } from "./PrescribedMed.ent";
 
 @ObjectType()
@@ -20,7 +18,6 @@ export class Medicine {
 	prescribedTo: PrescribedMed[];
 }
 
-
 @InputType()
 export class MedicineInput implements Partial<Medicine> {
 	@Field(() => String)
@@ -31,11 +28,3 @@ export class MedicineInput implements Partial<Medicine> {
 	@Length(10, 200)
 	description: string;
 }
-
-
-@Service()
-@EntityRepository(Medicine)
-export class MedicineRepository extends customRepository<Medicine>({
-	ifDefined: "Medicine has already been created",
-	ifNotDefined: "No such Medicine exists",
-}) {}

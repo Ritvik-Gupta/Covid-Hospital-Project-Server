@@ -1,12 +1,16 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
-import { DoctorRepository } from "../entity/Doctor.ent";
-import { Hospital, HospitalInput, HospitalRepository } from "../entity/Hospital.ent";
-import { HospRegisterRepository } from "../entity/HospRegister.ent";
-import { MedicineInput, MedicineRepository } from "../entity/Medicine.ent";
-import { StaffRepository } from "../entity/Staff.ent";
-import { perfectCtx, UserRoles } from "../service/customTypes";
+import { Hospital, HospitalInput, MedicineInput } from "../entity";
+import {
+	DoctorRepository,
+	HospitalRepository,
+	HospRegisterRepository,
+	MedicineRepository,
+	StaffRepository,
+} from "../repository";
+import { UserRoles } from "../service/customEnums";
+import { perfectCtx } from "../service/customTypes";
 import { FieldPath, normalizedFieldPaths } from "../service/normalizeInfo";
 
 @Service()

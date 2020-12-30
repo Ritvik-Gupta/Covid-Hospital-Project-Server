@@ -1,17 +1,7 @@
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	Column,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
-	PrimaryColumn
-} from "typeorm";
-import { Address } from "../model/Address.mod";
-import { customRepository } from "../service/Custom.rep";
-import { BloodGroup } from "../service/customTypes";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Address } from "../model";
+import { BloodGroup } from "../service";
 import { Appointment } from "./Appointment.ent";
 import { BedRegister } from "./BedRegister.ent";
 import { PrescribedMed } from "./PrescribedMed.ent";
@@ -52,10 +42,3 @@ export class PatientInput extends Address implements Partial<Patient> {
 	@Field(() => BloodGroup)
 	bloodGroup: BloodGroup;
 }
-
-@Service()
-@EntityRepository(Patient)
-export class PatientRepository extends customRepository<Patient>({
-	ifDefined: "Patient already exists",
-	ifNotDefined: "No such Patient exists",
-}) {}

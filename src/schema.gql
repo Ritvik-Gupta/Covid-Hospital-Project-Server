@@ -19,26 +19,28 @@ enum CovidEntry {
 # The javascript `Date` as string. Type represents date and time as the ISO Date string.
 scalar DateTime
 
-type HospRegister {
+type Room {
+  roomNo: ID!
   hospitalId: ID!
-  userId: ID!
-  joinDate: DateTime!
-  forUser: User!
+  createDate: DateTime!
+  hasBeds: [Bed!]!
 }
 
-type Doctor {
-  street: String!
-  city: String!
-  pincode: String
-  userId: ID!
-  qualifaction: String!
-  asUser: User!
+type Bed {
+  bedNo: ID!
+  roomNo: ID!
+  hospitalId: ID!
+  createDate: DateTime!
 }
 
-type Appointment {
-  doctorId: ID!
+type BedRegister {
+  bedNo: ID!
+  roomNo: ID!
+  hospitalId: ID!
   patientId: ID!
-  assignedDate: DateTime!
+  occupiedAtDate: DateTime!
+  forBed: Bed!
+  forPatient: Patient!
 }
 
 type Medicine {
@@ -87,48 +89,18 @@ enum BloodGroup {
   O_MINUS
 }
 
-type BedRegister {
-  bedNo: ID!
-  roomNo: ID!
-  hospitalId: ID!
+type Appointment {
+  doctorId: ID!
   patientId: ID!
-  occupiedAtDate: DateTime!
-  forBed: Bed!
-  forPatient: Patient!
+  assignedDate: DateTime!
 }
 
-type Bed {
-  bedNo: ID!
-  roomNo: ID!
-  hospitalId: ID!
-  createDate: DateTime!
-}
-
-type Room {
-  roomNo: ID!
-  hospitalId: ID!
-  createDate: DateTime!
-  hasBeds: [Bed!]!
-}
-
-type Hospital {
-  street: String!
-  city: String!
-  pincode: String
-  id: ID!
-  adminId: String!
-  name: String!
-  createDate: DateTime!
-  hasRooms: [Room!]!
-  userRecords: [HospRegister!]!
-  hasAdmin: Admin!
-}
-
-type Admin {
+type Doctor {
   street: String!
   city: String!
   pincode: String
   userId: ID!
+  qualifaction: String!
   asUser: User!
 }
 
@@ -163,11 +135,32 @@ enum UserRoles {
   ADMIN
 }
 
-input DoctorInput {
+type HospRegister {
+  hospitalId: ID!
+  userId: ID!
+  joinDate: DateTime!
+  forUser: User!
+}
+
+type Hospital {
   street: String!
   city: String!
   pincode: String
-  qualifaction: String!
+  id: ID!
+  adminId: String!
+  name: String!
+  createDate: DateTime!
+  hasRooms: [Room!]!
+  userRecords: [HospRegister!]!
+  hasAdmin: Admin!
+}
+
+type Admin {
+  street: String!
+  city: String!
+  pincode: String
+  userId: ID!
+  asUser: User!
 }
 
 input MedicineInput {
@@ -182,17 +175,11 @@ input PatientInput {
   bloodGroup: BloodGroup!
 }
 
-input HospitalInput {
+input DoctorInput {
   street: String!
   city: String!
   pincode: String
-  name: String!
-}
-
-input AdminInput {
-  street: String!
-  city: String!
-  pincode: String
+  qualifaction: String!
 }
 
 input StaffInput {
@@ -213,6 +200,19 @@ input UserInput {
   middleName: String
   lastName: String!
   gender: Gender!
+}
+
+input HospitalInput {
+  street: String!
+  city: String!
+  pincode: String
+  name: String!
+}
+
+input AdminInput {
+  street: String!
+  city: String!
+  pincode: String
 }
 
 type Query {

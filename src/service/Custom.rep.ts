@@ -6,17 +6,17 @@ export interface repositoryErrors {
 	ifNotDefined: string;
 }
 
-export const customRepository = <T>(repoErrors: repositoryErrors) => {
+export const customRepository = <T extends object>(repoErrors: repositoryErrors) => {
 	abstract class CustomRepository extends AbstractRepository<T> {
 		async ifDefined(where: FindConditions<T>): Promise<T> {
 			const value = await this.repository.findOne({ where });
-			if (value === undefined) throw new Error(repoErrors.ifNotDefined);
+			if (value === undefined) throw Error(repoErrors.ifNotDefined);
 			return value;
 		}
 
 		async ifNotDefined(where: FindConditions<T>): Promise<void> {
 			const [, check] = await this.repository.findAndCount({ where });
-			if (check > 0) throw new Error(repoErrors.ifDefined);
+			if (check > 0) throw Error(repoErrors.ifDefined);
 		}
 
 		create(entity: DeepPartial<T>): Promise<T> {

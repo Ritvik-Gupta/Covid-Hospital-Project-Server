@@ -1,17 +1,7 @@
 import { IsUppercase, Length } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	Column,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { Address } from "../model/Address.mod";
-import { customRepository } from "../service/Custom.rep";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Address } from "../model";
 import { Appointment } from "./Appointment.ent";
 import { User } from "./User.ent";
 
@@ -42,10 +32,3 @@ export class DoctorInput extends Address implements Partial<Doctor> {
 	@IsUppercase()
 	qualifaction: string;
 }
-
-@Service()
-@EntityRepository(Doctor)
-export class DoctorRepository extends customRepository<Doctor>({
-	ifDefined: "Doctor already exists",
-	ifNotDefined: "No such Doctor exists",
-}) {}

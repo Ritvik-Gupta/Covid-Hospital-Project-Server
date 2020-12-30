@@ -3,3 +3,4 @@ ormconfig.txt
 ormconfig.json
 .env
 .vscode
+dist

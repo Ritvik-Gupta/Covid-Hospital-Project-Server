@@ -1,14 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { Service } from "typedi";
-import {
-	CreateDateColumn,
-	Entity,
-	EntityRepository,
-	JoinColumn,
-	ManyToOne,
-	PrimaryColumn,
-} from "typeorm";
-import { customRepository } from "../service/Custom.rep";
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Doctor } from "./Doctor.ent";
 import { Patient } from "./Patient.ent";
 
@@ -35,10 +26,3 @@ export class Appointment {
 	@JoinColumn({ name: "patientId", referencedColumnName: "userId" })
 	withPatient: Patient;
 }
-
-@Service()
-@EntityRepository(Appointment)
-export class AppointmentRepository extends customRepository<Appointment>({
-	ifDefined: "Appointment already created",
-	ifNotDefined: "Appointment not found",
-}) {}
